@@ -1,0 +1,6 @@
+# ignore objects, anywhere in the tree.
+*.o
+*.swp
+*.so
+*.a
+

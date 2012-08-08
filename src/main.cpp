@@ -1,0 +1,117 @@
+/*
+ * main.cpp
+ *
+ * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+ */
+
+/** @mainpage OnPosix Library
+ * 
+ * @author Evidence Srl - www.evidence.eu.com
+ *
+ * <h1>Introduction</h1>
+ *
+ * OnPosix is a tiny C++ library to offer POSIX features to C++
+ * developers in a POSIX environment.
+ *
+ * Some examples about the characteristics offered by the library:
+ *
+ * <h2>Threads</h2>
+ *
+ * \code
+ * class MyThread: public PosixAbstractThread {
+ *	// Put thread arguments here
+ * public:
+ *	MyThread() {
+ *		// Initialize arguments here
+ *      }
+ *	void run() {
+ *		// Put thread code here
+ *		// Access arguments as normal attributes
+ *	}
+ * };
+ *
+ * int main ()
+ * {
+ *	MyThread t;
+ *	t.blockSignal(SIGTERM);
+ *	t.start();
+ *	t.waitForTermination();
+ * }
+ * \endcode
+ *
+ * <h2>Mutual exclusion</h2>
+ *
+ * \code
+ * PosixMutex m;
+ * m.lock();
+ * //....
+ * m.unlock();
+ * \endcode
+ *
+ * <h2>File descriptors</h2>
+ *
+ * \code
+ * FileDescriptor fd ("/tmp/myfile", O_RDONLY);
+ * Buffer b (10);
+ * fd.read (b, b.getSize());
+ * fd.close();
+ * \endcode
+ *
+ * <h2>Socket descriptors</h2>
+ *
+ * \code
+ * SocketServer serv (1234, SocketServer::stream);
+ * SocketDescriptor des (serv);
+ * Buffer b (10);
+ * des.read(b, b.getSize());
+ * des.close();
+ * \endcode
+ *
+ * <h2>Logging</h2>
+ *
+ * \code
+ * DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
+ * DEBUG(DBG_DEBUG, "hello " << "world");
+ * \endcode
+ *
+ * <h2>Timing</h2>
+ *
+ * \code
+ * Time t1;
+ * std::cout << t.getSeconds() << " " << t.getUSeconds() << std::endl;
+ * \endcode
+ *
+ * <h2>Watching multiple descriptors</h2>
+ *
+ * \code
+ * class FileReader: public AbstractDescriptorReader {
+ *	FileDescriptor fd1_;
+ *	FileDescriptor fd2_;
+ * public:
+ *	FileReader(){
+ *		//...
+ *		monitorDescriptor(fd1_);
+ *		monitorDescriptor(fd2_);
+ *	}
+ *	void dataAvailable(PosixDescriptor& des) {
+ *		std::cout << des.getDescriptorNumber() << "ready" << std::endl;
+ *	}
+ * }; 
+ * \endcode
+ */
+
+
