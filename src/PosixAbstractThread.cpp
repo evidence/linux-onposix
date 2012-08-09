@@ -99,6 +99,7 @@ bool PosixAbstractThread::waitForTermination()
 /**
  * \brief Masks a specific signal on this thread
  * This method allows to block a specific signal
+ * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be blocked
  * @return true on success; false if some error occurred
  */
@@ -118,6 +119,7 @@ bool PosixAbstractThread::blockSignal (int sig)
  * \brief Unmasks a signal previously masked
  * This method allows to unblock a specific signal previously blocked through
  * blockSignal().
+ * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be unblocked
  * @return true on success; false if some error occurred
  */
@@ -136,6 +138,7 @@ bool PosixAbstractThread::unblockSignal (int sig)
 /**
  * \brief Sends a signal to the thread
  * This method allows to send a signal from one thread to another thread
+ * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be sent
  * @return true on success; false if some error occurred
  */
@@ -151,6 +154,7 @@ bool PosixAbstractThread::sendSignal(int sig)
 /**
  * \brief Set a handler for a specific signal
  * This method allows to manually set a handler for handling a specific signal.
+ * The list of signals is available on /usr/include/bits/signum.h
  * Use signals less as possible, mainly for standard situations.
  * During the execution of the handler other signals may arrive. This can lead
  * to inconsistent states. The handler must be short.

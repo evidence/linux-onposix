@@ -122,7 +122,7 @@
  *
  * \code
  * Time t1;
- * std::cout << t.getSeconds() << " " << t.getUSeconds() << std::endl;
+ * std::cout << t1.getSeconds() << " " << t1.getUSeconds() << std::endl;
  * \endcode
  *
  * <h2>Watching multiple descriptors</h2>
@@ -142,6 +142,17 @@
  *	}
  * }; 
  * \endcode
+ *
+ * <h2>Assertions</h2>
+ *
+ * Assertions provided by this library work also when code is compiled with the
+ * -NDEBUG macro.
+ *
+ *  Example of usage:
+ *  \code
+ *  int i;
+ *  VERIFY_ASSERTION(i == 0);
+ *  \endcode
  */
 
 
