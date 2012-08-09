@@ -1,0 +1,8 @@
+========= 
+ ONPOSIX
+========= 
+
+OnPosix is a tiny C++ library to offer POSIX features to C++ developers in a
+POSIX environment.
+
+Documentation available on http://claudioscordino.github.com/onposix/

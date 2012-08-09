@@ -27,6 +27,36 @@
  * OnPosix is a tiny C++ library to offer POSIX features to C++
  * developers in a POSIX environment.
  *
+ * <h1>Installation</h1>
+ *
+ * To build the library, just type:
+ *
+ * \code
+ * make
+ * \endcode
+ *
+ * The library is built both as shared library (.so) and static library (.a).
+ *
+ * To install the library on your system, type
+ *
+ * \code
+ * make install
+ * \endcode
+ *
+ * To install the library in a specific directory, type
+ *
+ * \code
+ * make TARGET_DIR=/absolute/path install
+ * \endcode
+ *
+ * To generate the documentation using Doxygen, type
+ *
+ * \code
+ * make doc
+ * \endcode
+ *
+ * <h1>Examples of usage</h1>
+ *
  * Some examples about the characteristics offered by the library:
  *
  * <h2>Threads</h2>
