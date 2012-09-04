@@ -56,7 +56,6 @@ SocketServer::SocketServer(const std::string& name, S_mode mode):
 	serv_addr.sun_family = AF_UNIX;
 	strncpy(serv_addr.sun_path, name.c_str(),
 	    sizeof(serv_addr.sun_path) - 1);
-
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when binding socket");
@@ -101,7 +100,6 @@ SocketServer::SocketServer(const uint16_t port, S_mode mode):
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
-
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when binding socket");

@@ -50,11 +50,24 @@ PosixAbstractThread::PosixAbstractThread():
 {
 }
 
+
+/**
+ * \brief Destructor.
+ * In case the thread is running, it stops the thread and prints an error
+ * message.
+ */
+virtual ~PosixAbstractThread() {
+	if (isStarted_){
+		DEBUG(DBG_WARNING, "Warning: killing a running thread!");
+		stop();
+	}
+}
+
 /**
  * \brief Starts execution of the thread by calling run(). If the thread is
  * already started this function does nothing.
- * @return true if the thread is started or is already started, false if
- * an error occurs.
+ * @return true if the thread is started or it has been previously started;
+ * false if an error occurs when starting the thread.
  */
 bool PosixAbstractThread::start()
 {
@@ -70,8 +83,8 @@ bool PosixAbstractThread::start()
 
 /**
  * \brief Stops the running thread.
- * @return true on success, false if an error occurs or the thread
- * has not been started before.
+ * @return true on success; false if an error occurs or the thread
+ * is not running (i.e., it has not been started or it has been already stopped)
  */
 bool PosixAbstractThread::stop()
 {

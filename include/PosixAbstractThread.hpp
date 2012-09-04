@@ -91,20 +91,10 @@ protected:
 public:
 
 	PosixAbstractThread();
-
-	/**
-	 * \brief Destructor. It stops the thread.
-	 */
-	virtual ~PosixAbstractThread() {
-		stop();
-	}
-
+	virtual ~PosixAbstractThread();
 	bool start();
-
 	bool stop();
-
 	bool waitForTermination();
-
 	static bool blockSignal (int sig);
 	static bool unblockSignal (int sig);
 	bool sendSignal(int sig);
