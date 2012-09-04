@@ -25,7 +25,7 @@
 #include "FifoDescriptor.hpp"
 #include "Logger.hpp"
 #include "SocketDescriptor.hpp"
-#include "PosixAbstractThread.hpp"
+#include "AbstractThread.hpp"
 #include "Time.hpp"
 
 #include <cstdio>
@@ -346,7 +346,7 @@ void testLogger()
 	EXPECT(true, true);
 }
 
-class MyThread1: public PosixAbstractThread {
+class MyThread1: public AbstractThread {
         // Put thread arguments here
 	int sock;
 	struct sockaddr_un serv_addr;

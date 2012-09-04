@@ -1,5 +1,5 @@
 /*
- * PosixAbstractThread.hpp
+ * AbstractThread.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef POSIXABSTRACTTHREAD_HPP_
-#define POSIXABSTRACTTHREAD_HPP_
+#ifndef ABSTRACTTHREAD_HPP_
+#define ABSTRACTTHREAD_HPP_
 
 #include <pthread.h>
 
@@ -37,7 +37,7 @@ namespace onposix {
  *
  * Example of usage:
  * \code
- * class MyThread: public PosixAbstractThread {
+ * class MyThread: public AbstractThread {
  * 	// Put thread arguments here
  * public:
  *	MyThread() {
@@ -57,7 +57,7 @@ namespace onposix {
  * }
  * \endcode
  */
-class PosixAbstractThread {
+class AbstractThread {
 
 	static void* Execute(void* param);
 
@@ -66,8 +66,8 @@ class PosixAbstractThread {
 	 */
 	bool isStarted_;
 
-	PosixAbstractThread(const PosixAbstractThread&);
-	PosixAbstractThread& operator=(const PosixAbstractThread&);
+	AbstractThread(const AbstractThread&);
+	AbstractThread& operator=(const AbstractThread&);
 
 protected:
 
@@ -90,8 +90,8 @@ protected:
 
 public:
 
-	PosixAbstractThread();
-	virtual ~PosixAbstractThread();
+	AbstractThread();
+	virtual ~AbstractThread();
 	bool start();
 	bool stop();
 	bool waitForTermination();

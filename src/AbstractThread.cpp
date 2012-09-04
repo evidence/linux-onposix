@@ -1,5 +1,5 @@
 /*
- * PosixAbstractThread.cpp
+ * AbstractThread.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "PosixAbstractThread.hpp"
+#include "AbstractThread.hpp"
 #include <unistd.h>
 #include <csignal>
 #include <strings.h>
@@ -34,9 +34,9 @@ namespace onposix {
  * @param param The pointer to the concrete subclass.
  * @return Always zero.
  */
-void *PosixAbstractThread::Execute(void* param)
+void *AbstractThread::Execute(void* param)
 {
-	PosixAbstractThread* th = reinterpret_cast<PosixAbstractThread*>(param);
+	AbstractThread* th = reinterpret_cast<AbstractThread*>(param);
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	th->run();
 	return 0;
@@ -45,7 +45,7 @@ void *PosixAbstractThread::Execute(void* param)
 /**
  * \brief Constructor. Initialize the class attributes.
  */
-PosixAbstractThread::PosixAbstractThread():
+AbstractThread::AbstractThread():
 				isStarted_(false)
 {
 }
@@ -56,9 +56,9 @@ PosixAbstractThread::PosixAbstractThread():
  * In case the thread is running, it stops the thread and prints an error
  * message.
  */
-virtual ~PosixAbstractThread() {
+AbstractThread::~AbstractThread() {
 	if (isStarted_){
-		DEBUG(DBG_WARNING, "Warning: killing a running thread!");
+		DEBUG(DBG_WARN, "Warning: killing a running thread!");
 		stop();
 	}
 }
@@ -69,12 +69,12 @@ virtual ~PosixAbstractThread() {
  * @return true if the thread is started or it has been previously started;
  * false if an error occurs when starting the thread.
  */
-bool PosixAbstractThread::start()
+bool AbstractThread::start()
 {
 	if (isStarted_)
 		return true;
 
-	if (pthread_create(&handle_, NULL, PosixAbstractThread::Execute,
+	if (pthread_create(&handle_, NULL, AbstractThread::Execute,
 					   (void*)this) == 0)
 		isStarted_ = true;
 
@@ -86,7 +86,7 @@ bool PosixAbstractThread::start()
  * @return true on success; false if an error occurs or the thread
  * is not running (i.e., it has not been started or it has been already stopped)
  */
-bool PosixAbstractThread::stop()
+bool AbstractThread::stop()
 {
 	if (!isStarted_)
 		return false;
@@ -99,10 +99,10 @@ bool PosixAbstractThread::stop()
 
 /**
  * \brief Blocks the calling thread until the thread associated with
- * the PosixAbstractThread object has finished execution
+ * the AbstractThread object has finished execution
  * @return true on success, false if an error occurs.
  */
-bool PosixAbstractThread::waitForTermination()
+bool AbstractThread::waitForTermination()
 {
 	if (pthread_join(handle_, NULL) == 0)
 		return true;
@@ -116,7 +116,7 @@ bool PosixAbstractThread::waitForTermination()
  * @param sig the signal to be blocked
  * @return true on success; false if some error occurred
  */
-bool PosixAbstractThread::blockSignal (int sig)
+bool AbstractThread::blockSignal (int sig)
 {
 	sigset_t m;
 	sigemptyset(&m);
@@ -136,7 +136,7 @@ bool PosixAbstractThread::blockSignal (int sig)
  * @param sig the signal to be unblocked
  * @return true on success; false if some error occurred
  */
-bool PosixAbstractThread::unblockSignal (int sig)
+bool AbstractThread::unblockSignal (int sig)
 {
 	sigset_t m;
 	sigemptyset(&m);
@@ -155,7 +155,7 @@ bool PosixAbstractThread::unblockSignal (int sig)
  * @param sig the signal to be sent
  * @return true on success; false if some error occurred
  */
-bool PosixAbstractThread::sendSignal(int sig)
+bool AbstractThread::sendSignal(int sig)
 {
 	if (pthread_kill(handle_, sig) != 0){
 		DEBUG(DBG_ERROR, "Error: can't send signal " << sig);
@@ -180,7 +180,7 @@ bool PosixAbstractThread::sendSignal(int sig)
  * @param sig the signal to be sent
  * @return true on success; false if some error occurred
  */
-bool PosixAbstractThread::setSignalHandler(int sig, void (*handler) (int))
+bool AbstractThread::setSignalHandler(int sig, void (*handler) (int))
 {
 	bool ret = true;
 	sigset_t oldset, set;
