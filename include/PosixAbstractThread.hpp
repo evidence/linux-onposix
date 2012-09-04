@@ -76,7 +76,7 @@ protected:
 	 * This function can be used in the subclasses to check if a request
 	 * for termination has been made; if so, the thread is terminated.
 	 */
-	void checkForTermination() {
+	static void checkForTermination() {
 		pthread_testcancel();
 	}
 
@@ -105,10 +105,10 @@ public:
 
 	bool waitForTermination();
 
-	bool blockSignal (int sig);
-	bool unblockSignal (int sig);
+	static bool blockSignal (int sig);
+	static bool unblockSignal (int sig);
 	bool sendSignal(int sig);
-	bool setSignalHandler(int sig, void (*handler) (int));
+	static bool setSignalHandler(int sig, void (*handler) (int));
 
 };
 
