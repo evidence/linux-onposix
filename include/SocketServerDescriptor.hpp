@@ -1,5 +1,5 @@
 /*
- * SocketDescriptor.cpp
+ * SocketServerDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,24 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <stdexcept>
-#include "SocketDescriptor.hpp"
+#ifndef SOCKETSERVERDESCRIPTOR_HPP_
+#define SOCKETSERVERDESCRIPTOR_HPP_
+
+#include "PosixDescriptor.hpp"
+#include "SocketServer.hpp"
 
 namespace onposix {
 
 /**
- * \brief Constructor to accept() connections on a socket.
- * It calls accept().
- * @param socket Socket on which a new connection must be accepted.
- * @exception runtime_error in case of error in accept()
+ * \brief Abstraction of a socket descriptor.
+ *
+ * This is an abstract class for the concept of socket.
+ * This descriptor corresponds to a socket created with accept() over a
+ * SocketServer.
+ *
+ * Example of usage:
+ * \code
+ * SocketServer serv ("/tmp/mysocket", SocketServer::stream);
+ * SocketServerDescriptor des (serv);
+ * Buffer b (10);
+ * des.read(b, b.getSize());
+ * \endcode
  */
-SocketDescriptor::SocketDescriptor(const SocketServer& socket)
-{
-	fd_ = accept(socket.getDescriptorNumber(), NULL, 0);
-	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error in accept()!");
-		throw std::runtime_error("Accept error");
-	}
-}
+class SocketServerDescriptor: public PosixDescriptor {
+
+public:
+	explicit SocketServerDescriptor(const SocketServer& server);
+};
 
 } /* onposix */
+
+#endif /* SOCKETSERVERDESCRIPTOR_HPP_ */

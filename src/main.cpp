@@ -62,7 +62,7 @@
  * <h2>Threads</h2>
  *
  * \code
- * class MyThread: public PosixAbstractThread {
+ * class MyThread: public AbstractThread {
  *	// Put thread arguments here
  * public:
  *	MyThread() {
@@ -115,7 +115,7 @@
  *
  * \code
  * SocketServer serv (1234, SocketServer::stream);
- * SocketDescriptor des (serv);
+ * SocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());
  * des.close();
