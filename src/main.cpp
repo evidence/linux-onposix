@@ -92,6 +92,16 @@
  * m.unlock();
  * \endcode
  *
+ * <h2>Condition variables</h2>
+ *
+ * \code
+ * PosixCondition c;
+ * PosixMutex m;
+ * c.wait(&m);
+ * //....
+ * c.signal();
+ * \endcode
+ *
  * <h2>File descriptors</h2>
  *
  * \code

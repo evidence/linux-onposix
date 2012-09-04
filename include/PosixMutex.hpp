@@ -36,6 +36,8 @@ class PosixMutex {
 
 	pthread_mutex_t mutex_;
 
+	friend class PosixCondition;
+
 public:
 	PosixMutex();
 	~PosixMutex();
@@ -82,7 +84,7 @@ public:
 
 /**
  * \brief Class to simplify locking and unlocking of pthread mutex.
- * This class has the same purpouse of the MutexLocker class but works
+ * This class has the same purpose of the MutexLocker class but works
  * with pthread mutex type instead of PosixMutex class.
  */
 class PthreadMutexLocker {
