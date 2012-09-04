@@ -1,5 +1,5 @@
 /*
- * SocketServer.hpp
+ * SocketUdpServer.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef SOCKETSERVER_HPP_
-#define SOCKETSERVER_HPP_
+#ifndef SOCKETUDPSERVER_HPP_
+#define SOCKETUDPSERVER_HPP_
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -32,45 +32,29 @@
 #include <netinet/ip.h>
 #include <string>
 
+#include "AbstractSocketServer.hpp"
+
 namespace onposix {
 
 /**
  * \brief Abstraction of a socket server.
  * This descriptor corresponds to a socket created with socket().
  */
-class SocketServer {
+class SocketUdpServer: public AbstractSocketServer {
 
-	/**
-	 * \brief Number of the file descriptor.
-	 * This is the return value of socket().
-	 */
-	int fd_;
-
-	/**
-	 * \brief Type of socket (i.e., stream vs datagram)
-	 * This variable is used to discriminate between stream (e.g., TCP)
-	 * and datagram (e.g., UDP) protocols.
-	 */
-	enum S_mode_ {
-		M_stream	= 1 << 0,
-		M_dgram		= 1 << 1} socketMode_;
+	SocketUdpServer(const SocketUdpServer&);
+	SocketUdpServer& operator=(const SocketUdpServer&);
 
 public:
+	SocketUdpServer(const uint16_t port);
 
-	typedef S_mode_ S_mode;
-
-	static const S_mode stream = M_stream;
-	static const S_mode dgram = M_dgram;
-
-	SocketServer(const uint16_t port, S_mode);
-
-	SocketServer(const std::string& name, const S_mode mode);
+	SocketUdpServer(const std::string& name);
 
 	/**
 	 * \brief Destructor.
 	 * It just calls close() to close the descriptor.
 	 */
-	virtual ~SocketServer(){
+	virtual ~SocketUdpServer(){
 		close();
 	}
 
@@ -80,16 +64,8 @@ public:
 	inline void close(){
 		::close(fd_);
 	}
-
-	/**
-	 * \brief Method to get descriptor number.
-	 * @return Descriptor number.
-	 */
-	inline int getDescriptorNumber() const {
-		return fd_;
-	}
 };
 
 } /* onposix */
 
-#endif /* SOCKETSERVER_HPP_ */
+#endif /* SOCKETUDPSERVER_HPP_ */

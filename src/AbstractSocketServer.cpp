@@ -1,5 +1,5 @@
 /*
- * SocketServerDescriptor.cpp
+ * AbstractSocketServer.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,24 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <stdexcept>
-#include "SocketServerDescriptor.hpp"
+//#include <stdexcept>
+#include "AbstractSocketServer.hpp"
+//#include "Logger.hpp"
+
 
 namespace onposix {
 
-/**
- * \brief Constructor to accept() connections on a socket.
- * It calls accept().
- * @param socket Socket on which a new connection must be accepted.
- * @exception runtime_error in case of error in accept()
- */
-SocketServerDescriptor::SocketServerDescriptor(const SocketTcpServer& socket)
-{
-	fd_ = accept(socket.getDescriptorNumber(), NULL, 0);
-	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error in accept()!");
-		throw std::runtime_error("Accept error");
-	}
-}
 
 } /* onposix */

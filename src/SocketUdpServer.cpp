@@ -1,5 +1,5 @@
 /*
- * SocketServer.cpp
+ * SocketUdpServer.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,32 +19,23 @@
  */
 
 #include <stdexcept>
-#include "SocketServer.hpp"
+#include "SocketUdpServer.hpp"
 #include "Logger.hpp"
 
 
 namespace onposix {
 
-const int maxPendingConnections_ = 100;
-
-
 
 /**
  * \brief Constructor for local (i.e., AF_UNIX) sockets.
  * It calls socket()+bind().
- * If the protocol is a stream, it also calls listen().
  * @param name Name of the local socket on the filesystem
- * @param mode Mode, that can be M_stream or M_dgram
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-SocketServer::SocketServer(const std::string& name, S_mode mode):
-	socketMode_(mode)
+SocketUdpServer::SocketUdpServer(const std::string& name)
 {
 	// socket()
-	if (mode == M_stream)
-		fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
-	else
-		fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
+	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -61,34 +52,19 @@ SocketServer::SocketServer(const std::string& name, S_mode mode):
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
 	}
-
-	// listen()
-	if (mode == M_stream) {
-		if (listen(fd_, maxPendingConnections_) < 0) {
-			::close(fd_);
-			DEBUG(DBG_ERROR, "Error when listening");
-			throw std::runtime_error ("Listen error");
-		}
-	}
 }
 
 /**
  * \brief Constructor for IPv4 (i.e., AF_INET) sockets.
  * It calls socket()+bind().
- * If the protocol is a stream, it also calls listen().
  * @param port Port of the socket
- * @param mode Mode, that can be M_stream or M_dgram
  * @exception runtime_error in case of error in socket(), bind() or listen()
  *
  */
-SocketServer::SocketServer(const uint16_t port, S_mode mode):
-	socketMode_(mode)
+SocketUdpServer::SocketUdpServer(const uint16_t port)
 {
 	// socket()
-	if (mode == M_stream)
-		fd_ = socket(AF_INET, SOCK_STREAM, 0);
-	else
-		fd_ = socket(AF_INET, SOCK_DGRAM, 0);
+	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -104,15 +80,6 @@ SocketServer::SocketServer(const uint16_t port, S_mode mode):
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
-	}
-
-	// listen()
-	if (mode == M_stream) {
-		if (listen(fd_, maxPendingConnections_) < 0) {
-			::close(fd_);
-			DEBUG(DBG_ERROR, "Error when listening");
-			throw std::runtime_error ("Listen error");
-		}
 	}
 }
 

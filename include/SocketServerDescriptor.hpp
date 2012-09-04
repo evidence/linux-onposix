@@ -22,7 +22,7 @@
 #define SOCKETSERVERDESCRIPTOR_HPP_
 
 #include "PosixDescriptor.hpp"
-#include "SocketServer.hpp"
+#include "SocketTcpServer.hpp"
 
 namespace onposix {
 
@@ -44,7 +44,7 @@ namespace onposix {
 class SocketServerDescriptor: public PosixDescriptor {
 
 public:
-	explicit SocketServerDescriptor(const SocketServer& server);
+	explicit SocketServerDescriptor(const SocketTcpServer& server);
 };
 
 } /* onposix */
