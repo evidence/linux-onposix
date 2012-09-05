@@ -121,6 +121,14 @@
  * des.close();
  * \endcode
  *
+ * <h2>Pipes</h2>
+ *
+ * \code
+ * Pipe p;
+ * p.read(b, b.getSize());
+ * p.close();
+ * \endcode
+ *
  * <h2>Logging</h2>
  *
  * \code

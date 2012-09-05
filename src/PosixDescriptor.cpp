@@ -24,6 +24,7 @@ namespace onposix {
 
 /**
  * \brief Low-level read
+ *
  * This method is private because it is meant to be used through the other read()
  * methods.
  * Note: it can block the caller, because it continues reading until the given
@@ -53,7 +54,8 @@ int PosixDescriptor::__read (void* buffer, size_t size)
 
 
 /**
- * Method to read from the descriptor and fill a buffer.
+ * \brief Method to read from the descriptor and fill a buffer.
+ *
  * Note: this method may block current thread if data is not available.
  * The buffer is filled with the read data.
  * @param b Pointer to the buffer to be filled
@@ -70,7 +72,8 @@ int PosixDescriptor::read (Buffer* b, size_t size)
 }
 
 /**
- * Method to read from the descriptor.
+ * \brief Method to read from the descriptor.
+ *
  * Note: this method may block current thread if data is not available.
  * The buffer is filled with the read data.
  * @param p Pointer to the memory space to be filled
@@ -87,6 +90,7 @@ int PosixDescriptor::read (void* p, size_t size)
 
 /**
  * \brief Low-level write
+ *
  * This method is private because it is meant to be used through the other
  * write() methods.
  * Note: it can block the caller, because it continues writing until the given
@@ -116,7 +120,8 @@ int PosixDescriptor::__write (const void* buffer, size_t size)
 
 
 /**
- * Method to write data in a buffer to the descriptor.
+ * \brief Method to write data in a buffer to the descriptor.
+ *
  * Note: this method may block current thread if data cannot be written.
  * @param b Pointer to the buffer to be filled
  * @param size Number of bytes that must be written
@@ -132,7 +137,8 @@ int PosixDescriptor::write (Buffer* b, size_t size)
 }
 
 /**
- * Method to write to the descriptor.
+ * \brief Method to write to the descriptor.
+ *
  * Note: this method may block current thread if data cannot be written.
  * @param p Pointer to the memory space containing data
  * @param size Number of bytes that must be written
@@ -145,7 +151,8 @@ int PosixDescriptor::write (const void* p, size_t size)
 
 
 /**
- * Method to write a string to the descriptor.
+ * \brief Method to write a string to the descriptor.
+ *
  * Note: this method may block current thread if data cannot be written.
  * @param string to be written
  * @return -1 in case of error; the number of bytes read otherwise

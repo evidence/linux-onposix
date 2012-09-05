@@ -47,6 +47,10 @@ namespace onposix {
  */
 class PosixDescriptor {
 
+	PosixDescriptor(int fd): fd_(fd) {}
+
+	friend class Pipe;
+
 protected:
 	/**
 	 * \brief Number of the file descriptor.
