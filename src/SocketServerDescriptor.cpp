@@ -29,7 +29,7 @@ namespace onposix {
  * @param socket Socket on which a new connection must be accepted.
  * @exception runtime_error in case of error in accept()
  */
-SocketServerDescriptor::SocketServerDescriptor(const SocketTcpServer& socket)
+SocketServerDescriptor::SocketServerDescriptor(const TcpSocketServer& socket)
 {
 	fd_ = accept(socket.getDescriptorNumber(), NULL, 0);
 	if (fd_ < 0) {

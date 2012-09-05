@@ -114,7 +114,7 @@
  * <h2>Socket descriptors</h2>
  *
  * \code
- * SocketTcpServer serv (1234);
+ * TcpSocketServer serv (1234);
  * SocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());

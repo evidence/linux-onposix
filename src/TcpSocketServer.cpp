@@ -1,5 +1,5 @@
 /*
- * SocketTcpServer.cpp
+ * TcpSocketServer.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,7 +19,7 @@
  */
 
 #include <stdexcept>
-#include "SocketTcpServer.hpp"
+#include "TcpSocketServer.hpp"
 #include "Logger.hpp"
 
 
@@ -35,7 +35,7 @@ const int maxPendingConnections_ = 100;
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-SocketTcpServer::SocketTcpServer(const std::string& name)
+TcpSocketServer::TcpSocketServer(const std::string& name)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -72,7 +72,7 @@ SocketTcpServer::SocketTcpServer(const std::string& name)
  * @exception runtime_error in case of error in socket(), bind() or listen()
  *
  */
-SocketTcpServer::SocketTcpServer(const uint16_t port)
+TcpSocketServer::TcpSocketServer(const uint16_t port)
 {
 	// socket()
 	fd_ = socket(AF_INET, SOCK_STREAM, 0);

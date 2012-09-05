@@ -25,7 +25,7 @@
 #include "FifoDescriptor.hpp"
 #include "Logger.hpp"
 #include "SocketServerDescriptor.hpp"
-#include "SocketTcpServer.hpp"
+#include "TcpSocketServer.hpp"
 #include "AbstractThread.hpp"
 #include "Time.hpp"
 
@@ -408,7 +408,7 @@ void testThreadsAndSockets()
 {
 	unlink("/tmp/test-socket");
 	DEBUG(DBG_DEBUG, "Creating socket...");
-	SocketTcpServer serv("/tmp/test-socket");
+	TcpSocketServer serv("/tmp/test-socket");
 	DEBUG(DBG_DEBUG, "Creating thread...");
 	MyThread1 t;
 	DEBUG(DBG_DEBUG, "Running thread...");

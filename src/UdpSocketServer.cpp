@@ -1,5 +1,5 @@
 /*
- * SocketUdpServer.cpp
+ * UdpSocketServer.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,7 +19,7 @@
  */
 
 #include <stdexcept>
-#include "SocketUdpServer.hpp"
+#include "UdpSocketServer.hpp"
 #include "Logger.hpp"
 
 
@@ -32,7 +32,7 @@ namespace onposix {
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-SocketUdpServer::SocketUdpServer(const std::string& name)
+UdpSocketServer::UdpSocketServer(const std::string& name)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
@@ -61,7 +61,7 @@ SocketUdpServer::SocketUdpServer(const std::string& name)
  * @exception runtime_error in case of error in socket(), bind() or listen()
  *
  */
-SocketUdpServer::SocketUdpServer(const uint16_t port)
+UdpSocketServer::UdpSocketServer(const uint16_t port)
 {
 	// socket()
 	fd_ = socket(AF_INET, SOCK_DGRAM, 0);

@@ -2,7 +2,7 @@ LIBNAME = libonposix
 INCLUDE_DIR = ../include
 CXX = g++
 CXXFLAGS = -O3 -Wall -fPIC -I$(INCLUDE_DIR) 
-OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  SocketServerDescriptor.o AbstractSocketServer.o SocketUdpServer.o SocketTcpServer.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o
+OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  SocketServerDescriptor.o AbstractSocketServer.o UdpSocketServer.o TcpSocketServer.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o
 INCLUDES = $(INCLUDE_DIR)/*.hpp
 
 all: ../$(LIBNAME).a ../$(LIBNAME).so ../test
@@ -53,11 +53,11 @@ SocketServerDescriptor.o: $(INCLUDES)
 AbstractSocketServer.o: $(INCLUDES)
 	$(CXX) $(CXXFLAGS) -c AbstractSocketServer.cpp
 
-SocketTcpServer.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c SocketTcpServer.cpp
+TcpSocketServer.o: $(INCLUDES)
+	$(CXX) $(CXXFLAGS) -c TcpSocketServer.cpp
 
-SocketUdpServer.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c SocketUdpServer.cpp
+UdpSocketServer.o: $(INCLUDES)
+	$(CXX) $(CXXFLAGS) -c UdpSocketServer.cpp
 
 Time.o: $(INCLUDES)
 	$(CXX) $(CXXFLAGS) -c Time.cpp
