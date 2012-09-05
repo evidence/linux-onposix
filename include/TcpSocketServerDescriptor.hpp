@@ -1,5 +1,5 @@
 /*
- * SocketServerDescriptor.hpp
+ * TcpSocketServerDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef SOCKETSERVERDESCRIPTOR_HPP_
-#define SOCKETSERVERDESCRIPTOR_HPP_
+#ifndef TCPSOCKETSERVERDESCRIPTOR_HPP_
+#define TCPSOCKETSERVERDESCRIPTOR_HPP_
 
 #include "PosixDescriptor.hpp"
 #include "TcpSocketServer.hpp"
@@ -36,17 +36,17 @@ namespace onposix {
  * Example of usage:
  * \code
  * SocketServer serv ("/tmp/mysocket", SocketServer::stream);
- * SocketServerDescriptor des (serv);
+ * TcpSocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());
  * \endcode
  */
-class SocketServerDescriptor: public PosixDescriptor {
+class TcpSocketServerDescriptor: public PosixDescriptor {
 
 public:
-	explicit SocketServerDescriptor(const TcpSocketServer& server);
+	explicit TcpSocketServerDescriptor(const TcpSocketServer& server);
 };
 
 } /* onposix */
 
-#endif /* SOCKETSERVERDESCRIPTOR_HPP_ */
+#endif /* TCPSOCKETSERVERDESCRIPTOR_HPP_ */

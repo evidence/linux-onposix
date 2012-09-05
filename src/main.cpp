@@ -115,7 +115,7 @@
  *
  * \code
  * TcpSocketServer serv (1234);
- * SocketServerDescriptor des (serv);
+ * TcpSocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());
  * des.close();

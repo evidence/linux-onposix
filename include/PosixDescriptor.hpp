@@ -43,7 +43,7 @@ namespace onposix {
  * \brief Abstraction of a POSIX descriptor.
  * This is an abstract class for the concept of Posix descriptor.
  * The descriptor can correspond to a file (class FileDescriptor)
- * or to a socket (class SocketServerDescriptor).
+ * or to a socket (class TcpSocketServerDescriptor).
  */
 class PosixDescriptor {
 

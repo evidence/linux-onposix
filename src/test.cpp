@@ -24,7 +24,7 @@
 #include "FileDescriptor.hpp"
 #include "FifoDescriptor.hpp"
 #include "Logger.hpp"
-#include "SocketServerDescriptor.hpp"
+#include "TcpSocketServerDescriptor.hpp"
 #include "TcpSocketServer.hpp"
 #include "AbstractThread.hpp"
 #include "Time.hpp"
@@ -376,9 +376,9 @@ class MyThread1: public AbstractThread {
 
 
 class SocketReader: public AbstractDescriptorReader {
-	SocketServerDescriptor* s_;
+	TcpSocketServerDescriptor* s_;
  public:
-        SocketReader(DescriptorsMonitor& dm, SocketServerDescriptor* s):
+        SocketReader(DescriptorsMonitor& dm, TcpSocketServerDescriptor* s):
 		AbstractDescriptorReader(dm), s_(s){
                                 monitorDescriptor(*s);
         }
@@ -413,7 +413,7 @@ void testThreadsAndSockets()
 	MyThread1 t;
 	DEBUG(DBG_DEBUG, "Running thread...");
 	t.start();
-	SocketServerDescriptor des (serv);
+	TcpSocketServerDescriptor des (serv);
 	Buffer b (10);
 	DEBUG(DBG_DEBUG, "Reading data from socket...");
 	des.read(&b, b.getSize());
