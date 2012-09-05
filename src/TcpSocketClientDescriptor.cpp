@@ -18,13 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-
 
 #include "Logger.hpp"
 #include "TcpSocketClientDescriptor.hpp"

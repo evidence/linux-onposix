@@ -9,7 +9,7 @@
 
 namespace onposix {
 
-/** \brief Thread safe FIFO priority queue class.
+/** \brief Thread-safe FIFO priority queue class.
  * No aging techniques are implemented, so that the low priority elements
  * can starve. The class is noncopyable. \n
  * The template paramaters are:

@@ -25,7 +25,9 @@
 
 namespace onposix {
 
-
+/**
+ * \brief Class for a connection-less client.
+ */
 class UdpSocketClientDescriptor: public PosixDescriptor {
 public:
 	virtual ~UdpSocketClientDescriptor(){}

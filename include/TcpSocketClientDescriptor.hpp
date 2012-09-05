@@ -25,6 +25,9 @@
 
 namespace onposix {
 
+/**
+ * \brief Class for a connection-oriented client.
+ */
 class TcpSocketClientDescriptor: public PosixDescriptor {
 public:
 	virtual ~TcpSocketClientDescriptor(){}
