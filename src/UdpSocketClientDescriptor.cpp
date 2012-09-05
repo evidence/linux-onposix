@@ -1,5 +1,5 @@
 /*
- * UdpSocketServerDescriptor.cpp
+ * UdpSocketClientDescriptor.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,67 +19,77 @@
  */
 
 #include <stdexcept>
-#include "UdpSocketServerDescriptor.hpp"
-#include "Logger.hpp"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
+#include "Logger.hpp"
+#include "UdpSocketClientDescriptor.hpp"
 
 namespace onposix {
 
-
 /**
  * \brief Constructor for local (i.e., AF_UNIX) sockets.
- * It calls socket()+bind().
+ * It calls socket()+connect().
  * @param name Name of the local socket on the filesystem
- * @exception runtime_error in case of error in socket(), bind() or listen()
+ * @exception runtime_error in case of error in socket() or connect()
  */
-UdpSocketServerDescriptor::UdpSocketServerDescriptor(const std::string& name)
+UdpSocketClientDescriptor::UdpSocketClientDescriptor(const std::string& name)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating socket");
-		throw std::runtime_error ("Socket error");
+		DEBUG(DBG_ERROR, "Error when creating client socket");
+		throw std::runtime_error ("Client socket error");
 	}
 
-	// bind()
+	// connect()
 	struct sockaddr_un serv_addr;
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sun_family = AF_UNIX;
-	strncpy(serv_addr.sun_path, name.c_str(),
-	    sizeof(serv_addr.sun_path) - 1);
-	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+	strncpy(serv_addr.sun_path, name.c_str(), sizeof(serv_addr.sun_path) - 1);
+	if (connect(fd_, (struct sockaddr *) &serv_addr,
+	                                sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when binding socket");
-		throw std::runtime_error ("Bind error");
+		DEBUG(DBG_ERROR, "Error when creating client socket");
+		throw std::runtime_error ("Client socket error");
 	}
 }
 
+
 /**
  * \brief Constructor for UDP (i.e., AF_INET) sockets.
- * It calls socket()+bind().
+ * It calls socket()+connect().
  * @param port Port of the socket
- * @exception runtime_error in case of error in socket(), bind() or listen()
+ * @exception runtime_error in case of error in socket() or connect()
  */
-UdpSocketServerDescriptor::UdpSocketServerDescriptor(const uint16_t port)
+UdpSocketClientDescriptor::UdpSocketClientDescriptor(const std::string& address,
+				const uint16_t port)
 {
 	// socket()
 	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating socket");
-		throw std::runtime_error ("Socket error");
+		DEBUG(DBG_ERROR, "Error when creating client socket");
+		throw std::runtime_error ("Client socket error");
 	}
 
-	// bind()
+	// connect()
 	struct sockaddr_in serv_addr;
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+
+	struct in_addr addr;
+	inet_aton(address.c_str(), &addr);
+	bcopy(&addr, &serv_addr.sin_addr.s_addr, sizeof(addr));
+
+	if (connect(fd_, (struct sockaddr *) &serv_addr,
+	                                sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when binding socket");
-		throw std::runtime_error ("Bind error");
+		DEBUG(DBG_ERROR, "Error when creating client socket");
+		throw std::runtime_error ("Client socket error");
 	}
+
 }
 
 } /* onposix */
