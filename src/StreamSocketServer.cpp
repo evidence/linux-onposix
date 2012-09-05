@@ -1,5 +1,5 @@
 /*
- * UdpSocketServerDescriptor.cpp
+ * StreamSocketServer.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,25 +19,25 @@
  */
 
 #include <stdexcept>
-#include "UdpSocketServerDescriptor.hpp"
+#include "StreamSocketServer.hpp"
 #include "Logger.hpp"
 
 
 namespace onposix {
 
-
 /**
- * \brief Constructor for local connection-less sockets.
+ * \brief Constructor for local connection-oriented sockets.
  *
- * This constructor creates a connection-less AF_UNIX socket.
- * It calls socket()+bind().
+ * This constructor creates a connection-oriented AF_UNIX socket.
+ * It calls socket()+bind()+listen().
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-UdpSocketServerDescriptor::UdpSocketServerDescriptor(const std::string& name)
+StreamSocketServer::StreamSocketServer(const std::string& name,
+				int maxPendingConnections)
 {
 	// socket()
-	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
+	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -54,20 +54,29 @@ UdpSocketServerDescriptor::UdpSocketServerDescriptor(const std::string& name)
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
 	}
+
+	// listen()
+	if (listen(fd_, maxPendingConnections) < 0) {
+		::close(fd_);
+		DEBUG(DBG_ERROR, "Error when listening");
+		throw std::runtime_error ("Listen error");
+	}
 }
 
 /**
- * \brief Constructor for UDP sockets.
+ * \brief Constructor for TCP connection-oriented sockets.
  *
- * This constructor creates a connection-less AF_INET socket.
- * It calls socket()+bind().
+ * This constructor creates a connection-oriented AF_INET socket.
+ * It calls socket()+bind()+listen().
+ * If the protocol is a stream, it also calls listen().
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket(), bind() or listen()
+ *
  */
-UdpSocketServerDescriptor::UdpSocketServerDescriptor(const uint16_t port)
+StreamSocketServer::StreamSocketServer(const uint16_t port, int maxPendingConnections)
 {
 	// socket()
-	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
+	fd_ = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -83,6 +92,13 @@ UdpSocketServerDescriptor::UdpSocketServerDescriptor(const uint16_t port)
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
+	}
+
+	// listen()
+	if (listen(fd_, maxPendingConnections) < 0) {
+		::close(fd_);
+		DEBUG(DBG_ERROR, "Error when listening");
+		throw std::runtime_error ("Listen error");
 	}
 }
 

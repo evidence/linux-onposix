@@ -1,5 +1,5 @@
 /*
- * TcpSocketServerDescriptor.cpp
+ * StreamSocketClientDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,25 +18,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <stdexcept>
-#include "TcpSocketServerDescriptor.hpp"
+#ifndef STREAMSOCKETCLIENTDESCRIPTOR_HPP_
+#define STREAMSOCKETCLIENTDESCRIPTOR_HPP_
+
+#include "PosixDescriptor.hpp"
 
 namespace onposix {
 
 /**
- * \brief Constructor to accept() connections on a socket.
- *
- * This constructor calls accept().
- * @param socket TcpSocketServer on which a new connection must be accepted.
- * @exception runtime_error in case of error in accept()
+ * \brief Class for a connection-oriented client.
  */
-TcpSocketServerDescriptor::TcpSocketServerDescriptor(const TcpSocketServer& socket)
-{
-	fd_ = accept(socket.getDescriptorNumber(), NULL, 0);
-	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error in accept()!");
-		throw std::runtime_error("Accept error");
-	}
-}
+class StreamSocketClientDescriptor: public PosixDescriptor {
+public:
+	virtual ~StreamSocketClientDescriptor(){}
+	StreamSocketClientDescriptor(const std::string& name);
+	StreamSocketClientDescriptor(const std::string& address, const uint16_t port);
+};
 
 } /* onposix */
+
+#endif /* STREAMSOCKETCLIENTDESCRIPTOR_HPP_ */

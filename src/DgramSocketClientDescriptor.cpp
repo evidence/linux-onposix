@@ -1,5 +1,5 @@
 /*
- * UdpSocketClientDescriptor.cpp
+ * DgramSocketClientDescriptor.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -24,7 +24,7 @@
 #include <arpa/inet.h>
 
 #include "Logger.hpp"
-#include "UdpSocketClientDescriptor.hpp"
+#include "DgramSocketClientDescriptor.hpp"
 
 namespace onposix {
 
@@ -34,7 +34,7 @@ namespace onposix {
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket() or connect()
  */
-UdpSocketClientDescriptor::UdpSocketClientDescriptor(const std::string& name)
+DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& name)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
@@ -63,7 +63,7 @@ UdpSocketClientDescriptor::UdpSocketClientDescriptor(const std::string& name)
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket() or connect()
  */
-UdpSocketClientDescriptor::UdpSocketClientDescriptor(const std::string& address,
+DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& address,
 				const uint16_t port)
 {
 	// socket()

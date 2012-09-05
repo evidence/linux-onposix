@@ -1,5 +1,5 @@
 /*
- * TcpSocketServer.cpp
+ * DgramSocketServerDescriptor.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,25 +19,25 @@
  */
 
 #include <stdexcept>
-#include "TcpSocketServer.hpp"
+#include "DgramSocketServerDescriptor.hpp"
 #include "Logger.hpp"
 
 
 namespace onposix {
 
+
 /**
- * \brief Constructor for local connection-oriented sockets.
+ * \brief Constructor for local connection-less sockets.
  *
- * This constructor creates a connection-oriented AF_UNIX socket.
- * It calls socket()+bind()+listen().
+ * This constructor creates a connection-less AF_UNIX socket.
+ * It calls socket()+bind().
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-TcpSocketServer::TcpSocketServer(const std::string& name,
-				int maxPendingConnections)
+DgramSocketServerDescriptor::DgramSocketServerDescriptor(const std::string& name)
 {
 	// socket()
-	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
+	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -54,29 +54,20 @@ TcpSocketServer::TcpSocketServer(const std::string& name,
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
 	}
-
-	// listen()
-	if (listen(fd_, maxPendingConnections) < 0) {
-		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when listening");
-		throw std::runtime_error ("Listen error");
-	}
 }
 
 /**
- * \brief Constructor for TCP connection-oriented sockets.
+ * \brief Constructor for UDP sockets.
  *
- * This constructor creates a connection-oriented AF_INET socket.
- * It calls socket()+bind()+listen().
- * If the protocol is a stream, it also calls listen().
+ * This constructor creates a connection-less AF_INET socket.
+ * It calls socket()+bind().
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket(), bind() or listen()
- *
  */
-TcpSocketServer::TcpSocketServer(const uint16_t port, int maxPendingConnections)
+DgramSocketServerDescriptor::DgramSocketServerDescriptor(const uint16_t port)
 {
 	// socket()
-	fd_ = socket(AF_INET, SOCK_STREAM, 0);
+	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
 		DEBUG(DBG_ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
@@ -92,13 +83,6 @@ TcpSocketServer::TcpSocketServer(const uint16_t port, int maxPendingConnections)
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
-	}
-
-	// listen()
-	if (listen(fd_, maxPendingConnections) < 0) {
-		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when listening");
-		throw std::runtime_error ("Listen error");
 	}
 }
 

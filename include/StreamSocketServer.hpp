@@ -1,5 +1,5 @@
 /*
- * UdpSocketServerDescriptor.hpp
+ * StreamSocketServer.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef UDPSOCKETSERVERDESCRIPTOR_HPP_
-#define UDPSOCKETSERVERDESCRIPTOR_HPP_
+#ifndef STREAMSOCKETSERVER_HPP_
+#define STREAMSOCKETSERVER_HPP_
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -32,48 +32,61 @@
 #include <netinet/ip.h>
 #include <string>
 
-#include "PosixDescriptor.hpp"
-
 namespace onposix {
 
+///Default maximum number of pending connections
+#define STREAM_MAX_PENDING_CONNECTIONS 100
+
 /**
- * \brief Socket descriptor for connection-less communications.
+ * \brief Socket server for connection-oriented communications.
  *
- * This is a class to accept connection-less connections.
- *
- * Example of usage:
- * \code
- * UdpSocketServerDescriptor serv ("/tmp/mysocket");
- * Buffer b (10);
- * serv.read(b, b.getSize());
- * \endcode
+ * This class corresponds to a socket created with socket(), that must be
+ * given to the constructor of StreamSocketServerDescriptor to accept incoming
+ * connections.
  */
+class StreamSocketServer {
 
-class UdpSocketServerDescriptor: public PosixDescriptor {
+	StreamSocketServer(const StreamSocketServer&);
+	StreamSocketServer& operator=(const StreamSocketServer&);
 
-	UdpSocketServerDescriptor(const UdpSocketServerDescriptor&);
-	UdpSocketServerDescriptor& operator=(const UdpSocketServerDescriptor&);
+	/**
+	 * \brief Number of the file descriptor.
+	 * This is the return value of socket().
+	 */
+	int fd_;
 
 public:
-	UdpSocketServerDescriptor(const uint16_t port);
-	UdpSocketServerDescriptor(const std::string& name);
+
+	StreamSocketServer(const uint16_t port,
+	    int maxPendingConnections = STREAM_MAX_PENDING_CONNECTIONS);
+	StreamSocketServer(const std::string& name,
+	    int maxPendingConnections = STREAM_MAX_PENDING_CONNECTIONS);
+
 
 	/**
 	 * \brief Destructor.
 	 * It just calls close() to close the descriptor.
 	 */
-	virtual ~UdpSocketServerDescriptor(){
+	virtual ~StreamSocketServer(){
 		close();
 	}
 
 	/**
 	 * \brief Close the descriptor
 	 */
-	inline void close(){
+	void close(){
 		::close(fd_);
+	}
+
+	/**
+	 * \brief Method to get descriptor number.
+	 * @return Descriptor number.
+	 */
+	inline int getDescriptorNumber() const {
+		return fd_;
 	}
 };
 
 } /* onposix */
 
-#endif /* UDPSOCKETSERVERDESCRIPTOR_HPP_ */
+#endif /* STREAMSOCKETSERVER_HPP_ */

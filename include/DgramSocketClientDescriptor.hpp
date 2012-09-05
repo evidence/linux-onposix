@@ -1,5 +1,5 @@
 /*
- * TcpSocketServerDescriptor.hpp
+ * DgramSocketClientDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,35 +18,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef TCPSOCKETSERVERDESCRIPTOR_HPP_
-#define TCPSOCKETSERVERDESCRIPTOR_HPP_
+#ifndef DGRAMSOCKETCLIENTDESCRIPTOR_HPP_
+#define DGRAMSOCKETCLIENTDESCRIPTOR_HPP_
 
 #include "PosixDescriptor.hpp"
-#include "TcpSocketServer.hpp"
 
 namespace onposix {
 
 /**
- * \brief Socket descriptor for connection-oriented communications.
- *
- * This is a class to accept connection-oriented connections.
- * This descriptor corresponds to a socket created with accept() over a
- * TcpSocketServer.
- *
- * Example of usage:
- * \code
- * TcpSocketServer serv ("/tmp/mysocket");
- * TcpSocketServerDescriptor des (serv);
- * Buffer b (10);
- * des.read(b, b.getSize());
- * \endcode
+ * \brief Class for a connection-less client.
  */
-class TcpSocketServerDescriptor: public PosixDescriptor {
-
+class DgramSocketClientDescriptor: public PosixDescriptor {
 public:
-	explicit TcpSocketServerDescriptor(const TcpSocketServer& server);
+	virtual ~DgramSocketClientDescriptor(){}
+	DgramSocketClientDescriptor(const std::string& name);
+	DgramSocketClientDescriptor(const std::string& address, const uint16_t port);
 };
 
 } /* onposix */
 
-#endif /* TCPSOCKETSERVERDESCRIPTOR_HPP_ */
+#endif /* DGRAMSOCKETCLIENTDESCRIPTOR_HPP_ */

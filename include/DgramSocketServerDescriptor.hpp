@@ -1,5 +1,5 @@
 /*
- * TcpSocketServer.hpp
+ * DgramSocketServerDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef TCPSOCKETSERVER_HPP_
-#define TCPSOCKETSERVER_HPP_
+#ifndef DGRAMSOCKETSERVERDESCRIPTOR_HPP_
+#define DGRAMSOCKETSERVERDESCRIPTOR_HPP_
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -32,61 +32,48 @@
 #include <netinet/ip.h>
 #include <string>
 
+#include "PosixDescriptor.hpp"
+
 namespace onposix {
 
-///Default maximum number of pending connections
-#define TCP_MAX_PENDING_CONNECTIONS 100
-
 /**
- * \brief Socket server for connection-oriented communications.
+ * \brief Socket descriptor for connection-less communications.
  *
- * This class corresponds to a socket created with socket(), that must be
- * given to the constructor of TcpSocketServerDescriptor to accept incoming
- * connections.
+ * This is a class to accept connection-less connections.
+ *
+ * Example of usage:
+ * \code
+ * DgramSocketServerDescriptor serv ("/tmp/mysocket");
+ * Buffer b (10);
+ * serv.read(b, b.getSize());
+ * \endcode
  */
-class TcpSocketServer {
 
-	TcpSocketServer(const TcpSocketServer&);
-	TcpSocketServer& operator=(const TcpSocketServer&);
+class DgramSocketServerDescriptor: public PosixDescriptor {
 
-	/**
-	 * \brief Number of the file descriptor.
-	 * This is the return value of socket().
-	 */
-	int fd_;
+	DgramSocketServerDescriptor(const DgramSocketServerDescriptor&);
+	DgramSocketServerDescriptor& operator=(const DgramSocketServerDescriptor&);
 
 public:
-
-	TcpSocketServer(const uint16_t port,
-	    int maxPendingConnections = TCP_MAX_PENDING_CONNECTIONS);
-	TcpSocketServer(const std::string& name,
-	    int maxPendingConnections = TCP_MAX_PENDING_CONNECTIONS);
-
+	DgramSocketServerDescriptor(const uint16_t port);
+	DgramSocketServerDescriptor(const std::string& name);
 
 	/**
 	 * \brief Destructor.
 	 * It just calls close() to close the descriptor.
 	 */
-	virtual ~TcpSocketServer(){
+	virtual ~DgramSocketServerDescriptor(){
 		close();
 	}
 
 	/**
 	 * \brief Close the descriptor
 	 */
-	void close(){
+	inline void close(){
 		::close(fd_);
-	}
-
-	/**
-	 * \brief Method to get descriptor number.
-	 * @return Descriptor number.
-	 */
-	inline int getDescriptorNumber() const {
-		return fd_;
 	}
 };
 
 } /* onposix */
 
-#endif /* TCPSOCKETSERVER_HPP_ */
+#endif /* DGRAMSOCKETSERVERDESCRIPTOR_HPP_ */

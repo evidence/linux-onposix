@@ -1,5 +1,5 @@
 /*
- * TcpSocketClientDescriptor.cpp
+ * StreamSocketClientDescriptor.cpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -24,7 +24,7 @@
 #include <arpa/inet.h>
 
 #include "Logger.hpp"
-#include "TcpSocketClientDescriptor.hpp"
+#include "StreamSocketClientDescriptor.hpp"
 
 namespace onposix {
 
@@ -34,7 +34,7 @@ namespace onposix {
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket() or connect()
  */
-TcpSocketClientDescriptor::TcpSocketClientDescriptor(const std::string& name)
+StreamSocketClientDescriptor::StreamSocketClientDescriptor(const std::string& name)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -63,7 +63,7 @@ TcpSocketClientDescriptor::TcpSocketClientDescriptor(const std::string& name)
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket() or connect()
  */
-TcpSocketClientDescriptor::TcpSocketClientDescriptor(const std::string& address,
+StreamSocketClientDescriptor::StreamSocketClientDescriptor(const std::string& address,
 				const uint16_t port)
 {
 	// socket()

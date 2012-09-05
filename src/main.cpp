@@ -114,8 +114,8 @@
  * <h2>Socket descriptors</h2>
  *
  * \code
- * TcpSocketServer serv (1234);
- * TcpSocketServerDescriptor des (serv);
+ * StreamSocketServer serv (1234);
+ * StreamSocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());
  * des.close();

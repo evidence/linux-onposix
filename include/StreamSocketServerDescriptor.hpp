@@ -1,5 +1,5 @@
 /*
- * UdpSocketClientDescriptor.hpp
+ * StreamSocketServerDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -18,23 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef UDPSOCKETCLIENTDESCRIPTOR_HPP_
-#define UDPSOCKETCLIENTDESCRIPTOR_HPP_
+#ifndef STREAMSOCKETSERVERDESCRIPTOR_HPP_
+#define STREAMSOCKETSERVERDESCRIPTOR_HPP_
 
 #include "PosixDescriptor.hpp"
+#include "StreamSocketServer.hpp"
 
 namespace onposix {
 
 /**
- * \brief Class for a connection-less client.
+ * \brief Socket descriptor for connection-oriented communications.
+ *
+ * This is a class to accept connection-oriented connections.
+ * This descriptor corresponds to a socket created with accept() over a
+ * StreamSocketServer.
+ *
+ * Example of usage:
+ * \code
+ * StreamSocketServer serv ("/tmp/mysocket");
+ * StreamSocketServerDescriptor des (serv);
+ * Buffer b (10);
+ * des.read(b, b.getSize());
+ * \endcode
  */
-class UdpSocketClientDescriptor: public PosixDescriptor {
+class StreamSocketServerDescriptor: public PosixDescriptor {
+
 public:
-	virtual ~UdpSocketClientDescriptor(){}
-	UdpSocketClientDescriptor(const std::string& name);
-	UdpSocketClientDescriptor(const std::string& address, const uint16_t port);
+	explicit StreamSocketServerDescriptor(const StreamSocketServer& server);
 };
 
 } /* onposix */
 
-#endif /* UDPSOCKETCLIENTDESCRIPTOR_HPP_ */
+#endif /* STREAMSOCKETSERVERDESCRIPTOR_HPP_ */
