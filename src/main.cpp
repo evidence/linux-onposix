@@ -18,14 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-/** @mainpage OnPosix Library
+/** 
+ *
+ * \htmlonly
+ * <br>
+ * <center>
+ * <img src="../onposix.png" width="250"></img><br>
+ * Minimal Posix C++ library
+ * </center>
+ * <br>
+ * \endhtmlonly
+ *
+ * @mainpage OnPosix Library
  * 
  * @author Evidence Srl - www.evidence.eu.com
  *
  * <h1>Introduction</h1>
  *
- * OnPosix is a tiny C++ library to offer POSIX features to C++
- * developers in a POSIX environment.
+ * OnPosix is a tiny C++ library to abstract POSIX features to C++
+ * developers.
  *
  * <h1>Installation</h1>
  *
@@ -113,12 +124,25 @@
  *
  * <h2>Socket descriptors</h2>
  *
+ * Server-side:
  * \code
- * StreamSocketServer serv (1234);
- * StreamSocketServerDescriptor des (serv);
+ * int port = 1234;
+ * StreamSocketServer serv (port);
+ * while (true) {
+ *	StreamSocketServerDescriptor des (serv);
+ *	Buffer b (10);
+ *	des.read(b, b.getSize());
+ *	// ...
+ * }
+ * \endcode
+ *
+ * Client-side:
+ * \code
+ * int port = 1234;
+ * std::string address = "192.168.10.133";
+ * StreamSocketClientDescriptor des(address, port);
  * Buffer b (10);
- * des.read(b, b.getSize());
- * des.close();
+ * des.write(b, b.getSize());
  * \endcode
  *
  * <h2>Pipes</h2>
@@ -134,6 +158,8 @@
  * \code
  * DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
  * DEBUG(DBG_DEBUG, "hello " << "world");
+ * DEBUG(DBG_WARN, "something " << "strange");
+ * DEBUG(DBG_ERR, "this is an error");
  * \endcode
  *
  * <h2>Timing</h2>
