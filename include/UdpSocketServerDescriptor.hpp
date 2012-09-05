@@ -1,5 +1,5 @@
 /*
- * UdpSocketServer.hpp
+ * UdpSocketServerDescriptor.hpp
  *
  * Copyright (C) 2012 Evidence Srl - www.evidence.eu.com
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef UDPSOCKETSERVER_HPP_
-#define UDPSOCKETSERVER_HPP_
+#ifndef UDPSOCKETSERVERDESCRIPTOR_HPP_
+#define UDPSOCKETSERVERDESCRIPTOR_HPP_
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -40,21 +40,21 @@ namespace onposix {
  * \brief Abstraction of a socket server.
  * This descriptor corresponds to a socket created with socket().
  */
-class UdpSocketServer: public PosixDescriptor {
+class UdpSocketServerDescriptor: public PosixDescriptor {
 
-	UdpSocketServer(const UdpSocketServer&);
-	UdpSocketServer& operator=(const UdpSocketServer&);
+	UdpSocketServerDescriptor(const UdpSocketServerDescriptor&);
+	UdpSocketServerDescriptor& operator=(const UdpSocketServerDescriptor&);
 
 public:
-	UdpSocketServer(const uint16_t port);
+	UdpSocketServerDescriptor(const uint16_t port);
 
-	UdpSocketServer(const std::string& name);
+	UdpSocketServerDescriptor(const std::string& name);
 
 	/**
 	 * \brief Destructor.
 	 * It just calls close() to close the descriptor.
 	 */
-	virtual ~UdpSocketServer(){
+	virtual ~UdpSocketServerDescriptor(){
 		close();
 	}
 
@@ -68,4 +68,4 @@ public:
 
 } /* onposix */
 
-#endif /* UDPSOCKETSERVER_HPP_ */
+#endif /* UDPSOCKETSERVERDESCRIPTOR_HPP_ */
