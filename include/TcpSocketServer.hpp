@@ -32,18 +32,22 @@
 #include <netinet/ip.h>
 #include <string>
 
-#include "AbstractSocketServer.hpp"
-
 namespace onposix {
 
 /**
  * \brief Abstraction of a socket server.
  * This descriptor corresponds to a socket created with socket().
  */
-class TcpSocketServer: public AbstractSocketServer {
+class TcpSocketServer {
 
 	TcpSocketServer(const TcpSocketServer&);
 	TcpSocketServer& operator=(const TcpSocketServer&);
+
+	/**
+	 * \brief Number of the file descriptor.
+	 * This is the return value of socket().
+	 */
+	int fd_;
 
 public:
 
@@ -61,8 +65,16 @@ public:
 	/**
 	 * \brief Close the descriptor
 	 */
-	virtual void close(){
+	void close(){
 		::close(fd_);
+	}
+
+	/**
+	 * \brief Method to get descriptor number.
+	 * @return Descriptor number.
+	 */
+	inline int getDescriptorNumber() const {
+		return fd_;
 	}
 };
 

@@ -32,7 +32,7 @@
 #include <netinet/ip.h>
 #include <string>
 
-#include "AbstractSocketServer.hpp"
+#include "PosixDescriptor.hpp"
 
 namespace onposix {
 
@@ -40,7 +40,7 @@ namespace onposix {
  * \brief Abstraction of a socket server.
  * This descriptor corresponds to a socket created with socket().
  */
-class UdpSocketServer: public AbstractSocketServer {
+class UdpSocketServer: public PosixDescriptor {
 
 	UdpSocketServer(const UdpSocketServer&);
 	UdpSocketServer& operator=(const UdpSocketServer&);
