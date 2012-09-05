@@ -25,17 +25,14 @@
 
 namespace onposix {
 
-const int maxPendingConnections_ = 100;
-
-
-
 /**
  * \brief Constructor for local (i.e., AF_UNIX) sockets.
  * It calls socket()+bind()+listen().
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
  */
-TcpSocketServer::TcpSocketServer(const std::string& name)
+TcpSocketServer::TcpSocketServer(const std::string& name,
+				int maxPendingConnections)
 {
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -57,7 +54,7 @@ TcpSocketServer::TcpSocketServer(const std::string& name)
 	}
 
 	// listen()
-	if (listen(fd_, maxPendingConnections_) < 0) {
+	if (listen(fd_, maxPendingConnections) < 0) {
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when listening");
 		throw std::runtime_error ("Listen error");
@@ -72,7 +69,7 @@ TcpSocketServer::TcpSocketServer(const std::string& name)
  * @exception runtime_error in case of error in socket(), bind() or listen()
  *
  */
-TcpSocketServer::TcpSocketServer(const uint16_t port)
+TcpSocketServer::TcpSocketServer(const uint16_t port, int maxPendingConnections)
 {
 	// socket()
 	fd_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -94,7 +91,7 @@ TcpSocketServer::TcpSocketServer(const uint16_t port)
 	}
 
 	// listen()
-	if (listen(fd_, maxPendingConnections_) < 0) {
+	if (listen(fd_, maxPendingConnections) < 0) {
 		::close(fd_);
 		DEBUG(DBG_ERROR, "Error when listening");
 		throw std::runtime_error ("Listen error");

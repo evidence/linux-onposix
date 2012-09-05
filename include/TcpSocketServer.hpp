@@ -34,6 +34,8 @@
 
 namespace onposix {
 
+#define TCP_MAX_PENDING_CONNECTIONS 100
+
 /**
  * \brief Abstraction of a socket server.
  * This descriptor corresponds to a socket created with socket().
@@ -51,8 +53,11 @@ class TcpSocketServer {
 
 public:
 
-	TcpSocketServer(const uint16_t port);
-	TcpSocketServer(const std::string& name);
+	TcpSocketServer(const uint16_t port,
+	    int maxPendingConnections = TCP_MAX_PENDING_CONNECTIONS);
+	TcpSocketServer(const std::string& name,
+	    int maxPendingConnections = TCP_MAX_PENDING_CONNECTIONS);
+
 
 	/**
 	 * \brief Destructor.

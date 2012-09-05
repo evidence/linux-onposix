@@ -35,7 +35,7 @@ namespace onposix {
  *
  * Example of usage:
  * \code
- * SocketServer serv ("/tmp/mysocket", SocketServer::stream);
+ * TcpSocketServer serv ("/tmp/mysocket");
  * TcpSocketServerDescriptor des (serv);
  * Buffer b (10);
  * des.read(b, b.getSize());
