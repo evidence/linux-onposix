@@ -27,11 +27,11 @@
 namespace onposix {
 
 /**
- * \brief Abstraction of a socket descriptor.
+ * \brief Socket descriptor for connection-oriented communications.
  *
- * This is an abstract class for the concept of socket.
+ * This is a class to accept connection-oriented connections.
  * This descriptor corresponds to a socket created with accept() over a
- * SocketServer.
+ * TcpSocketServer.
  *
  * Example of usage:
  * \code

@@ -37,9 +37,18 @@
 namespace onposix {
 
 /**
- * \brief Abstraction of a socket server.
- * This descriptor corresponds to a socket created with socket().
+ * \brief Socket descriptor for connection-less communications.
+ *
+ * This is a class to accept connection-less connections.
+ *
+ * Example of usage:
+ * \code
+ * UdpSocketServerDescriptor serv ("/tmp/mysocket");
+ * Buffer b (10);
+ * serv.read(b, b.getSize());
+ * \endcode
  */
+
 class UdpSocketServerDescriptor: public PosixDescriptor {
 
 	UdpSocketServerDescriptor(const UdpSocketServerDescriptor&);
@@ -47,7 +56,6 @@ class UdpSocketServerDescriptor: public PosixDescriptor {
 
 public:
 	UdpSocketServerDescriptor(const uint16_t port);
-
 	UdpSocketServerDescriptor(const std::string& name);
 
 	/**

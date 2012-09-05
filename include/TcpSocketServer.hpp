@@ -34,11 +34,15 @@
 
 namespace onposix {
 
+///Default maximum number of pending connections
 #define TCP_MAX_PENDING_CONNECTIONS 100
 
 /**
- * \brief Abstraction of a socket server.
- * This descriptor corresponds to a socket created with socket().
+ * \brief Socket server for connection-oriented communications.
+ *
+ * This class corresponds to a socket created with socket(), that must be
+ * given to the constructor of TcpSocketServerDescriptor to accept incoming
+ * connections.
  */
 class TcpSocketServer {
 

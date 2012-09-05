@@ -25,8 +25,9 @@ namespace onposix {
 
 /**
  * \brief Constructor to accept() connections on a socket.
- * It calls accept().
- * @param socket Socket on which a new connection must be accepted.
+ *
+ * This constructor calls accept().
+ * @param socket TcpSocketServer on which a new connection must be accepted.
  * @exception runtime_error in case of error in accept()
  */
 TcpSocketServerDescriptor::TcpSocketServerDescriptor(const TcpSocketServer& socket)

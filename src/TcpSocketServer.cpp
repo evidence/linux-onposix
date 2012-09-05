@@ -26,7 +26,9 @@
 namespace onposix {
 
 /**
- * \brief Constructor for local (i.e., AF_UNIX) sockets.
+ * \brief Constructor for local connection-oriented sockets.
+ *
+ * This constructor creates a connection-oriented AF_UNIX socket.
  * It calls socket()+bind()+listen().
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket(), bind() or listen()
@@ -62,8 +64,10 @@ TcpSocketServer::TcpSocketServer(const std::string& name,
 }
 
 /**
- * \brief Constructor for TCP (i.e., AF_INET) sockets.
- * It calls socket()+bind().
+ * \brief Constructor for TCP connection-oriented sockets.
+ *
+ * This constructor creates a connection-oriented AF_INET socket.
+ * It calls socket()+bind()+listen().
  * If the protocol is a stream, it also calls listen().
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket(), bind() or listen()
