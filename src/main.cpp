@@ -33,11 +33,15 @@
  * 
  * @author Evidence Srl - www.evidence.eu.com
  *
+ * <br>
+ * <br>
  * <h1>Introduction</h1>
  *
  * OnPosix is a tiny C++ library to abstract POSIX features to C++
  * developers.
  *
+ * <br>
+ * <br>
  * <h1>Installation</h1>
  *
  * To build the library, just type:
@@ -66,6 +70,8 @@
  * make doc
  * \endcode
  *
+ * <br>
+ * <br>
  * <h1>Examples of usage</h1>
  *
  * Some examples about the characteristics offered by the library:
