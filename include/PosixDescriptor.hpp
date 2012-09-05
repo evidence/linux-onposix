@@ -93,15 +93,6 @@ public:
 	}
 
 	/**
-	 * \brief Sync the descriptor
-	 * Method to call fsync on the descriptor. Usually after a write
-	 * operation.
-	 */
-	inline void sync(){
-		::fsync(fd_);
-	}
-
-	/**
 	 * \brief Copy constructor.
 	 * The copy constructor is called to copy an existing object to
 	 * another object that is being constructed.

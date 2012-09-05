@@ -55,6 +55,16 @@ public:
 	inline int lseek(int offset) {
 		return ::lseek(fd_, offset, SEEK_SET);
 	}
+
+
+	/**
+	 * \brief Sync the descriptor
+	 * Method to call fsync on the descriptor. Usually after a write
+	 * operation.
+	 */
+	inline void sync(){
+		::fsync(fd_);
+	}
 };
 
 } /* onposix */
