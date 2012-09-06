@@ -43,7 +43,7 @@ class Pipe {
 	PosixDescriptor* write_;
 
 public:
-	Pipe(int flags = 0);
+	Pipe();
 
 	/**
 	 * \brief Destructor.
