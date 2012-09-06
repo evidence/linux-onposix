@@ -23,7 +23,7 @@
  * \htmlonly
  * <br>
  * <center>
- * <img src="../onposix.png" width="250"></img><br>
+ * <img src="onposix.png" width="250"></img><br>
  * Minimal Posix C++ library
  * </center>
  * <br>
@@ -31,7 +31,7 @@
  *
  * @mainpage OnPosix Library
  * 
- * @author Evidence Srl - www.evidence.eu.com
+ * @author Evidence Srl - <a href="http://www.evidence.eu.com">www.evidence.eu.com</a>
  *
  * <br>
  * <br>
@@ -39,6 +39,19 @@
  *
  * OnPosix is a tiny C++ library to abstract POSIX features to C++
  * developers.
+ *
+ *
+ * <br>
+ * <br>
+ * <h1>Download</h1>
+ *
+ * Type
+ * \code
+ * git clone git://git.code.sf.net/p/onposix/code onposix-code
+ * \endcode
+ *
+ * or <a href="http://sourceforge.net/projects/onposix/files/">
+ * download from Sourceforge</a>.
  *
  * <br>
  * <br>
