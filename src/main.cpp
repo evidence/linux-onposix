@@ -216,6 +216,14 @@
  *  int i;
  *  VERIFY_ASSERTION(i == 0);
  *  \endcode
+ *
+ *
+ * <br>
+ * <br>
+ * <h1>Support</h1>
+ *
+ * A <a href="http://sourceforge.net/p/onposix/mailman/">mailing list</a>
+ * is available on Sourceforge.
  */
 
 
