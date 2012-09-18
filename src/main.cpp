@@ -31,16 +31,29 @@
  *
  * @mainpage OnPosix Library
  * 
- * @author Evidence Srl - <a href="http://www.evidence.eu.com">www.evidence.eu.com</a>
+ * @author Evidence Srl - <a href="http://www.evidence.eu.com" target="_blank">www.evidence.eu.com</a>
  *
  * <br>
  * <br>
  * <h1>Introduction</h1>
  *
  * OnPosix is a tiny C++ library to abstract POSIX features to C++
- * developers.
- *
- *
+ * developers.<br>
+ * <br>
+ * Most features offered by this library can be found either inside the
+ * <a href="http://www.boost.org" target="_blank">Boost library</a>
+ * or in a standard library compliant with the C++11 standard.<br>
+ * Unfortunately, however, for some embedded Linux devices, these libraries
+ * cannot represent viable solutions, due to the lack of memory space
+ * (for the Boost libraries) and the lack of a new C++ compiler
+ * (e.g., on Xilinx MicroBlaze).
+ * On these platforms, the OnPosix library represents a good and cheap solution
+ * to have object-oriented mechanisms on POSIX platforms.<br>
+ * <br>
+ * The library is available both as a shared (.so) and a static
+ * (.a) library. 
+ * 
+ * <br>
  * <br>
  * <br>
  * <h1>Download</h1>
