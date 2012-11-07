@@ -129,7 +129,8 @@ public:
 	static bool unblockSignal (int sig);
 	bool sendSignal(int sig);
 	static bool setSignalHandler(int sig, void (*handler) (int));
-
+	bool setSchedParam(int policy, int priority);
+	bool getSchedParam(int* policy, int* priority);
 };
 
 } /* onposix */

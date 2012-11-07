@@ -199,4 +199,40 @@ bool AbstractThread::setSignalHandler(int sig, void (*handler) (int))
 	return ret;
 }
 
+
+/**
+ * \brief Set scheduling policy and priority
+ * @param policy: policy (SCHED_FIFO, SCHED_RR or SCHED_OTHER)
+ * @param priority: scheduling priority
+ * @return true in case of success; false in case of error
+ */
+bool AbstractThread::setSchedParam(int policy, int priority)
+{
+	struct sched_param p;
+	p.sched_priority = priority;
+	if (pthread_setschedparam(handle_, policy, &p) == 0)
+		return true;
+	else
+		return false;
+}
+
+/**
+ * \brief Get current scheduling policy and priority
+ * @param policy: policy (SCHED_FIFO, SCHED_RR or SCHED_OTHER)
+ * @param priority: scheduling priority
+ * @return true in case of success; false in case of error
+ */
+bool AbstractThread::getSchedParam(int* policy, int* priority)
+{
+	struct sched_param p;
+	int ret = pthread_getschedparam(handle_, policy, &p);
+	*priority = p.sched_priority;
+	if (ret == 0)
+		return true;
+	else
+		return false;
+}
+
+
+
 } /* onposix */
