@@ -56,6 +56,36 @@ namespace onposix {
  * 	t.waitForTermination();
  * }
  * \endcode
+ *
+ * In case a return value must be passed from the finished thread to the
+ * other thread, this can be achieved as follows:
+ *
+ * \code
+ * class MyThread: public AbstractThread {
+ * 	int returnValue_;
+ * public:
+ *	MyThread(): returnValue_(0) {
+ *		// Initialize other arguments here
+ *	}
+ * 	void run() {
+ * 		// Put thread code here
+ * 		returnValue_ = ...;
+ * 	}
+ * 	inline int getReturnValue() {
+ *		return returnValue_;
+ *	}
+ * };
+ *
+ * int main ()
+ * {
+ * 	MyThread t;
+ * 	t.start();
+ * 	t.waitForTermination();
+ *	// Attention: get return arguments only after the thread has
+ *	// terminated the execution, to avoid race conditions!
+ * 	int ret = t.getReturnValue();
+ * }
+ * \endcode
  */
 class AbstractThread {
 
