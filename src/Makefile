@@ -18,55 +18,38 @@ all: ../$(LIBNAME).a ../$(LIBNAME).so ../test
 	$(CXX) $(CXXFLAGS) -o ../test test.o $(OBJECTS) -lpthread
 
 test.o: $(INCLUDES) test.cpp
-	$(CXX) $(CXXFLAGS) -c test.cpp
 
 Buffer.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c Buffer.cpp
 
 DescriptorsMonitor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c DescriptorsMonitor.cpp
 
 FileDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c FileDescriptor.cpp
 
 FifoDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c FifoDescriptor.cpp
 
 Logger.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c Logger.cpp
 
 PosixDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c PosixDescriptor.cpp
 
 AbstractThread.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c AbstractThread.cpp
 
 PosixMutex.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c PosixMutex.cpp
 
 PosixCondition.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c PosixCondition.cpp
 
 StreamSocketServerDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c StreamSocketServerDescriptor.cpp
 
 StreamSocketServer.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c StreamSocketServer.cpp
 
 DgramSocketServerDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c DgramSocketServerDescriptor.cpp
 
 StreamSocketClientDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c StreamSocketClientDescriptor.cpp
 
 DgramSocketClientDescriptor.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c DgramSocketClientDescriptor.cpp
 
 Time.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c Time.cpp
 
 Pipe.o: $(INCLUDES)
-	$(CXX) $(CXXFLAGS) -c Pipe.cpp
 
 .PHONY: clean
 
