@@ -23,6 +23,8 @@
 #include <csignal>
 #include <strings.h>
 #include "Logger.hpp"
+#include <stdexcept>
+
 
 namespace onposix {
 
@@ -219,7 +221,8 @@ bool AbstractThread::setSchedParam(int policy, int priority)
 /**
  * \brief Get current scheduling policy and priority
  * @param policy: policy (SCHED_FIFO, SCHED_RR or SCHED_OTHER)
- * @param priority: scheduling priority
+ * @param priority: scheduling priority; it has a meaning only for SCHED_FIFO
+ * and SCHED_RR
  * @return true in case of success; false in case of error
  */
 bool AbstractThread::getSchedParam(int* policy, int* priority)
@@ -231,6 +234,59 @@ bool AbstractThread::getSchedParam(int* policy, int* priority)
 		return true;
 	else
 		return false;
+}
+
+/**
+ * \brief Set CPU affinity
+ *
+ * Example of usage:
+ * \code
+ * std::vector<bool> v (2);
+ * v[0] = true;
+ * v[1] = false;
+ * setAffinity(v);
+ * \endcode
+ * @param v: vector of booleans containing the affinity (true/false)
+ * @exception std::runtime_error in case affinity cannot be set
+ */
+void AbstractThread::setAffinity(const std::vector<bool>& v)
+{
+	cpu_set_t s;
+	CPU_ZERO(&s);
+	for (unsigned int i = 0; (i < v.size()) && (i < CPU_SETSIZE); ++i)
+		if (v[i])
+			CPU_SET(i, &s);
+
+	if ((pthread_setaffinity_np(handle_, sizeof(s), &s) != 0))
+		throw std::runtime_error ("Set affinity error");
+}
+
+/**
+ * \brief Get CPU affinity
+ *
+ * Example of usage:
+ * \code
+ * std::vector<bool> v (2);
+ * getAffinity(&v);
+ * std::cout << "Affinity: " << v[0] << " " << v[1] << std::endl;
+ * \endcode
+ * @param v: vector of booleans containing the current affinity (true/false)
+ * @exception std::runtime_error in case affinity cannot be get
+ */
+void AbstractThread::getAffinity(std::vector<bool>* v)
+{
+	cpu_set_t s;
+	CPU_ZERO(&s);
+
+	if ((pthread_getaffinity_np(handle_, sizeof(s), &s) != 0))
+		throw std::runtime_error ("Get affinity error");
+
+        for (unsigned int j = 0; (j < CPU_SETSIZE) && (j < v->size()); ++j) {
+		if (CPU_ISSET(j, &s))
+			(*v)[j] = true;
+		else
+		(*v)[j] = false;
+	}
 }
 
 

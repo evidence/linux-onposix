@@ -281,69 +281,69 @@ void testLogger()
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_DEBUG, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "16. Should not appear on screen");
+	DEBUG(DBG_WARN, "16. This message should not appear on screen");
 	EXPECT(true, false);
-	DEBUG(DBG_ERROR, "17. Should not appear on screen");
+	DEBUG(DBG_ERROR, "17. This message should not appear on screen");
 	EXPECT(true, false);
-	DEBUG(DBG_DEBUG, "18. Should not appear on screen");
+	DEBUG(DBG_DEBUG, "18. This message should not appear on screen");
 	EXPECT(true, false);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_WARN, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "19. Should not appear on screen");
+	DEBUG(DBG_WARN, "19. This message should not appear on screen");
 	EXPECT(true, false);
-	DEBUG(DBG_ERROR, "20. Should not appear on screen");
+	DEBUG(DBG_ERROR, "20. This message should not appear on screen");
 	EXPECT(true, false);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_ERROR, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_ERROR, "21. Should not appear on screen");
+	DEBUG(DBG_ERROR, "21. This message should not appear on screen");
 	EXPECT(true, false);
 
 	// PRINT ONLY ON SCREEN
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "22. Should not appear on file");
+	DEBUG(DBG_WARN, "22. This message should not appear on file");
 	EXPECT(false, true);
-	DEBUG(DBG_ERROR, "23. Should not appear on file");
+	DEBUG(DBG_ERROR, "23. This message should not appear on file");
 	EXPECT(false, true);
-	DEBUG(DBG_DEBUG, "24. Should not appear on file");
+	DEBUG(DBG_DEBUG, "24. This message should not appear on file");
 	EXPECT(false, true);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_WARN);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "25. Should not appear on file");
+	DEBUG(DBG_WARN, "25. This message should not appear on file");
 	EXPECT(false, true);
-	DEBUG(DBG_ERROR, "26. Should not appear on file");
+	DEBUG(DBG_ERROR, "26. This message should not appear on file");
 	EXPECT(false, true);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
 	EXPECT(false, false);
-	DEBUG(DBG_ERROR, "27. Should not appear on file");
+	DEBUG(DBG_ERROR, "27. This message should not appear on file");
 	EXPECT(false, true);
 
 	// PRINT ON SCREEN AND FILE
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "28. Should appear on both");
+	DEBUG(DBG_WARN, "28. This message should appear on both");
 	EXPECT(true, true);
-	DEBUG(DBG_ERROR, "29. Should appear on both");
+	DEBUG(DBG_ERROR, "29. This message should appear on both");
 	EXPECT(true, true);
-	DEBUG(DBG_DEBUG, "30. Should appear on both");
+	DEBUG(DBG_DEBUG, "30. This message should appear on both");
 	EXPECT(true, true);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_WARN, DBG_WARN);
 	EXPECT(false, false);
-	DEBUG(DBG_WARN, "31. Should appear on both");
+	DEBUG(DBG_WARN, "31. This message should appear on both");
 	EXPECT(true, true);
-	DEBUG(DBG_ERROR, "32. Should appear on both");
+	DEBUG(DBG_ERROR, "32. This message should appear on both");
 	EXPECT(true, true);
 
 	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_ERROR, DBG_DEBUG);
 	EXPECT(false, false);
-	DEBUG(DBG_ERROR, "33. Should appear on both");
+	DEBUG(DBG_ERROR, "33. This message should appear on both");
 	EXPECT(true, true);
 }
 
@@ -358,7 +358,7 @@ class MyThread1: public AbstractThread {
 		strcpy(serv_addr.sun_path, "/tmp/test-socket");
 	}
         void run() {
-		sleep(2);
+		sleep(5);
 		sock = socket(AF_UNIX, SOCK_STREAM, 0);
 		connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 		const char* b1 = "ABCDEFGHILMNOP";
@@ -413,6 +413,39 @@ void testThreadsAndSockets()
 	MyThread1 t;
 	DEBUG(DBG_DEBUG, "Running thread...");
 	t.start();
+
+	DEBUG(DBG_DEBUG, "Getting thread affinity...");
+	std::vector<bool> g(2);
+	t.getAffinity(&g);
+	DEBUG(DBG_DEBUG, "Current affinity: " << g[0] << " " << g[1]);
+
+	DEBUG(DBG_DEBUG, "Setting thread affinity...");
+	g[0] = false;
+	g[1] = true;
+	t.setAffinity(g);
+	t.getAffinity(&g);
+	DEBUG(DBG_DEBUG, "Current affinity: " << g[0] << " " << g[1]);
+
+	DEBUG(DBG_DEBUG, "Setting thread affinity...");
+	g[0] = true;
+	g[1] = false;
+	t.setAffinity(g);
+	t.getAffinity(&g);
+	DEBUG(DBG_DEBUG, "Current affinity: " << g[0] << " " << g[1]);
+
+	int policy, prio;
+	t.getSchedParam(&policy, &prio);
+	DEBUG(DBG_DEBUG, "Current scheduling: " << policy << " " << prio);
+
+	policy = SCHED_RR;
+	prio = 1;
+	if (!t.setSchedParam(policy, prio))
+		DEBUG(DBG_ERROR, "Error in setSchedParam!");
+
+	t.getSchedParam(&policy, &prio);
+	DEBUG(DBG_DEBUG, "Current scheduling: " << policy << " " << prio);
+
+
 	StreamSocketServerDescriptor des (serv);
 	Buffer b (10);
 	DEBUG(DBG_DEBUG, "Reading data from socket...");

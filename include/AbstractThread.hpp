@@ -21,7 +21,12 @@
 #ifndef ABSTRACTTHREAD_HPP_
 #define ABSTRACTTHREAD_HPP_
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <pthread.h>
+
+#include <vector>
 
 namespace onposix {
 
@@ -131,6 +136,8 @@ public:
 	static bool setSignalHandler(int sig, void (*handler) (int));
 	bool setSchedParam(int policy, int priority);
 	bool getSchedParam(int* policy, int* priority);
+	void setAffinity(const std::vector<bool>& s);
+	void getAffinity(std::vector<bool>* v);
 };
 
 } /* onposix */
