@@ -1,7 +1,7 @@
 LIBNAME = libonposix
 INCLUDE_DIR = ../include
 CXX = g++
-CXXFLAGS = -O3 -Wall -fPIC -I$(INCLUDE_DIR) 
+CXXFLAGS = -O3 -Wall -Wextra -fPIC -I$(INCLUDE_DIR) 
 OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  StreamSocketServerDescriptor.o DgramSocketServerDescriptor.o StreamSocketServer.o StreamSocketClientDescriptor.o DgramSocketClientDescriptor.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o Pipe.o
 INCLUDES = $(INCLUDE_DIR)/*.hpp
 
