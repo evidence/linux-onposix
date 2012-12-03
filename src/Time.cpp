@@ -45,9 +45,9 @@ Time::Time(clockid_t clockType): clockType_(clockType)
 }
 
 /**
- * \brief Method to add seconds and useconds to the current value
+ * \brief Method to add seconds and nseconds to the current value
  * @param sec Number of seconds to be added
- * @param usec Number of useconds to be added
+ * @param usec Number of nseconds to be added
  */
 void Time::add(time_t sec, long nsec)
 {
@@ -58,7 +58,7 @@ void Time::add(time_t sec, long nsec)
 /**
  * \brief Method to set the time to a specific value
  * @param sec Number of seconds to be set
- * @param usec Number of useconds to be set
+ * @param usec Number of nseconds to be set
  */
 void Time::set(time_t sec, long nsec)
 {

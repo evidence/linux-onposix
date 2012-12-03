@@ -198,7 +198,7 @@
  *
  * \code
  * Time t1;
- * std::cout << t1.getSeconds() << " " << t1.getUSeconds() << std::endl;
+ * std::cout << t1.getSeconds() << " " << t1.getNSeconds() << std::endl;
  * \endcode
  *
  * <h2>Watching multiple descriptors</h2>
