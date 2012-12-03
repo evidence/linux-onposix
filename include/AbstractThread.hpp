@@ -136,8 +136,11 @@ public:
 	static bool setSignalHandler(int sig, void (*handler) (int));
 	bool setSchedParam(int policy, int priority);
 	bool getSchedParam(int* policy, int* priority);
+
+#ifdef ONPOSIX_LINUX_SPECIFIC
 	void setAffinity(const std::vector<bool>& s);
 	void getAffinity(std::vector<bool>* v);
+#endif /* ONPOSIX_LINUX_SPECIFIC */
 };
 
 } /* onposix */

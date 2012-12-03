@@ -236,6 +236,8 @@ bool AbstractThread::getSchedParam(int* policy, int* priority)
 		return false;
 }
 
+
+#ifdef ONPOSIX_LINUX_SPECIFIC
 /**
  * \brief Set CPU affinity
  *
@@ -288,6 +290,7 @@ void AbstractThread::getAffinity(std::vector<bool>* v)
 		(*v)[j] = false;
 	}
 }
+#endif /* ONPOSIX_LINUX_SPECIFIC */
 
 
 

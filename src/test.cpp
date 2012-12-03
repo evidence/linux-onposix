@@ -414,6 +414,7 @@ void testThreadsAndSockets()
 	DEBUG(DBG_DEBUG, "Running thread...");
 	t.start();
 
+#ifdef ONPOSIX_LINUX_SPECIFIC
 	DEBUG(DBG_DEBUG, "Getting thread affinity...");
 	std::vector<bool> g(2);
 	t.getAffinity(&g);
@@ -432,6 +433,7 @@ void testThreadsAndSockets()
 	t.setAffinity(g);
 	t.getAffinity(&g);
 	DEBUG(DBG_DEBUG, "Current affinity: " << g[0] << " " << g[1]);
+#endif /* ONPOSIX_LINUX_SPECIFIC */
 
 	int policy, prio;
 	t.getSchedParam(&policy, &prio);
