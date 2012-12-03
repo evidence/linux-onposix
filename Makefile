@@ -1,4 +1,4 @@
-ONPOSIX_VERSION=1.1
+ONPOSIX_VERSION=1.2
 export ONPOSIX_VERSION
 LIBNAME = libonposix
 .PHONY: all clean install doc
