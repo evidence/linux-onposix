@@ -27,13 +27,21 @@ namespace onposix {
 
 /**
  * \brief Default constructor.
- * It initializes the class with the current time (calling gettimeofday())
- * @exception std::runtime_error in case of error
+ * It initializes the class with the current time (calling clock_gettime()
+ * @param clockType: the type of the clock:
+ * <ul>
+ * <li> CLOCK_REALTIME: System-wide time.
+ * <li> CLOCK_MONOTONIC (default): Monotonic time since some unspecified starting point.
+ * It cannot be set.
+ * <li> CLOCK_PROCESS_CPUTIME_ID: Per-process cpu time.
+ * <li> CLOCK_THREAD_CPUTIME_ID: Per-thread  cpu time.
+ * </ul>
+ * This parameter affects the initial value and the result of resetToCurrentTime()
+ * @exception std::runtime_error, thrown by resetToCurrentTime()
  */
-Time::Time()
+Time::Time(clockid_t clockType): clockType_(clockType)
 {
-	if (gettimeofday(&time_, NULL) != 0)
-		throw std::runtime_error("Can't get current time");
+	resetToCurrentTime();
 }
 
 /**
@@ -41,10 +49,10 @@ Time::Time()
  * @param sec Number of seconds to be added
  * @param usec Number of useconds to be added
  */
-void Time::add(time_t sec, suseconds_t usec)
+void Time::add(time_t sec, long nsec)
 {
-	time_.tv_usec += (usec%1000000);
-	time_.tv_sec += sec + (usec - (usec%1000000))%1000000;
+	time_.tv_nsec += nsec;
+	time_.tv_sec += sec;
 }
 
 /**
@@ -52,10 +60,10 @@ void Time::add(time_t sec, suseconds_t usec)
  * @param sec Number of seconds to be set
  * @param usec Number of useconds to be set
  */
-void Time::set(time_t sec, suseconds_t usec)
+void Time::set(time_t sec, long nsec)
 {
-	time_.tv_usec = (usec%1000000);
-	time_.tv_sec = sec + (usec - (usec%1000000))%1000000;
+	time_.tv_nsec = nsec;
+	time_.tv_sec = sec;
 }
 
 /**
@@ -65,7 +73,7 @@ void Time::set(time_t sec, suseconds_t usec)
  */
 void Time::resetToCurrentTime()
 {
-	if (gettimeofday(&time_, NULL) != 0)
+	if (clock_gettime(clockType_, &time_) != 0)
 		throw std::runtime_error("Can't get current time");
 }
 
@@ -77,7 +85,7 @@ bool Time::operator< (const Time& ref) const
 	if (time_.tv_sec < ref.time_.tv_sec)
 		return true;
 	else if ((time_.tv_sec == ref.time_.tv_sec) &&
-		 (time_.tv_usec < ref.time_.tv_usec))
+		 (time_.tv_nsec < ref.time_.tv_nsec))
 			return true;
 	return false;
 }
@@ -90,7 +98,7 @@ bool Time::operator> (const Time& ref) const
 	if (time_.tv_sec > ref.time_.tv_sec)
 		return true;
 	else if ((time_.tv_sec == ref.time_.tv_sec) &&
-		 (time_.tv_usec > ref.time_.tv_usec))
+		 (time_.tv_nsec > ref.time_.tv_nsec))
 			return true;
 	return false;
 }
@@ -102,9 +110,25 @@ bool Time::operator> (const Time& ref) const
 bool Time::operator== (const Time& ref) const
 {
 	if ((time_.tv_sec == ref.time_.tv_sec) &&
-		(time_.tv_usec == ref.time_.tv_usec))
+		(time_.tv_nsec == ref.time_.tv_nsec))
 			return true;
 	return false;
 }
+
+/**
+ * \brief Method to get timer resolition.
+ * @param sec: number of seconds of resolution.
+ * @param nsec: number of seconds of resolution.
+ * @exception std::runtime_error in case of error
+ */
+void Time::getResolution (time_t* sec, long* nsec)
+{
+	timespec ret;
+	if (clock_getres(clockType_, &ret) != 0)
+		throw std::runtime_error("Can't get time resoultion");
+	*sec = ret.tv_sec;
+	*nsec = ret.tv_nsec;
+}
+
 
 } /* onposix */

@@ -67,7 +67,7 @@ public:
 	int timedWait(PosixMutex* m, const Time& abstime) {
 		timespec ts;
 		ts.tv_sec = abstime.getSeconds();
-		ts.tv_nsec = abstime.getUSeconds()*1000;
+		ts.tv_nsec = abstime.getNSeconds();
 		return pthread_cond_timedwait(&cond_, &(m->mutex_), &ts);
 	}
 

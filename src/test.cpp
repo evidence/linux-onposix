@@ -469,9 +469,9 @@ void testTime()
 {
 	Time a;
 	Time b;
-	std::cout << "A: " << a.getSeconds() << "\t" << a.getUSeconds()
+	std::cout << "A: " << a.getSeconds() << "\t" << a.getNSeconds()
 	    << std::endl;
-	std::cout << "B: " << b.getSeconds() << "\t" << b.getUSeconds()
+	std::cout << "B: " << b.getSeconds() << "\t" << b.getNSeconds()
 	    << std::endl;
 	if ((a < b) || (a == b)) {
 		DEBUG(DBG_DEBUG, "1. Time: OK!");

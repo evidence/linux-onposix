@@ -11,11 +11,11 @@ all: ../$(LIBNAME).a ../$(LIBNAME).so ../test
 	ar rcs ../$(LIBNAME).a $(OBJECTS)
 
 ../$(LIBNAME).so: $(OBJECTS)
-	$(CXX) $(CFLAGS) -shared -Wl,-soname,$(LIBNAME).so.1 -o ../$(LIBNAME).$(ONPOSIX_VERSION) $(OBJECTS) -lpthread
+	$(CXX) $(CFLAGS) -shared -Wl,-soname,$(LIBNAME).so.1 -o ../$(LIBNAME).$(ONPOSIX_VERSION) $(OBJECTS) -lpthread -lrt
 	ln -f -s $(LIBNAME).$(ONPOSIX_VERSION) ../$(LIBNAME).so
 
 ../test: test.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o ../test test.o $(OBJECTS) -lpthread
+	$(CXX) $(CXXFLAGS) -o ../test test.o $(OBJECTS) -lpthread -lrt
 
 test.o: $(INCLUDES) test.cpp
 

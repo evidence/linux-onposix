@@ -21,13 +21,13 @@
 #ifndef TIME_HPP_
 #define TIME_HPP_
 
-#include <sys/time.h>
+#include <time.h>
 
 namespace onposix {
 
 /**
  * \brief Class to contain a time
- * This class wraps a time, with a resolution of microseconds.
+ * This class wraps a time, with a resolution of nanoseconds.
  * It is useful to get the current time and to make comparisons between times.
  */
 class Time
@@ -35,22 +35,29 @@ class Time
 	/**
 	 * \brief Time in the form returned by gettimeofday()
 	 */
-	struct timeval time_;
+	struct timespec time_;
+
+	/**
+	 * Type of clock.
+	 */
+	clockid_t clockType_;
 public:
-	Time();
+	Time(clockid_t clockType = CLOCK_MONOTONIC);
 	virtual ~Time(){}
-	void add(time_t sec, suseconds_t usec);
-	void set(time_t sec, suseconds_t usec);
+	void add(time_t sec, long nsec);
+	void set(time_t sec, long nsec);
 	void resetToCurrentTime();
 	bool operator< (const Time& ref) const;
 	bool operator> (const Time& ref) const;
 	bool operator== (const Time& ref) const;
+	void getResolution (time_t* sec, long* nsec);
+
 
 	/**
 	 * \brief Method to get the number of seconds
 	 * @return Number of seconds
 	 */
-	inline unsigned int getSeconds() const {
+	inline time_t getSeconds() const {
 		return time_.tv_sec;
 	}
 
@@ -58,8 +65,8 @@ public:
 	 * \brief Method to get the number of microseconds
 	 * @return Number of microseconds
 	 */
-	inline unsigned int getUSeconds() const {
-		return time_.tv_usec;
+	inline long getNSeconds() const {
+		return time_.tv_nsec;
 	}
 };
 
