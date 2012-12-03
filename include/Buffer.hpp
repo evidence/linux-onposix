@@ -42,6 +42,9 @@ class Buffer {
 	 */
 	char* data_;
 
+	// Disable default copy constructor
+	Buffer(const Buffer&);
+
 public:
 	explicit Buffer(unsigned long int size);
 	virtual ~Buffer();

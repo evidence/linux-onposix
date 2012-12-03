@@ -42,6 +42,9 @@ class Pipe {
 	PosixDescriptor* read_;
 	PosixDescriptor* write_;
 
+	// Disable default copy constructor
+	Pipe(const Pipe&);
+
 public:
 	Pipe();
 
