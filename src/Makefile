@@ -1,11 +1,9 @@
-LIBNAME = libonposix
 INCLUDE_DIR = ../include
-CXX = g++
-CXXFLAGS = -O3 -Wall -Wextra -fPIC -I$(INCLUDE_DIR) 
 OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  StreamSocketServerDescriptor.o DgramSocketServerDescriptor.o StreamSocketServer.o StreamSocketClientDescriptor.o DgramSocketClientDescriptor.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o Pipe.o
 INCLUDES = $(INCLUDE_DIR)/*.hpp
+CXXFLAGS += -I$(INCLUDE_DIR) 
 
-all: ../$(LIBNAME).a ../$(LIBNAME).so ../test
+all: ../$(LIBNAME).a ../$(LIBNAME).so 
 
 ../$(LIBNAME).a: $(OBJECTS)
 	ar rcs ../$(LIBNAME).a $(OBJECTS)
@@ -13,11 +11,6 @@ all: ../$(LIBNAME).a ../$(LIBNAME).so ../test
 ../$(LIBNAME).so: $(OBJECTS)
 	$(CXX) $(CFLAGS) -shared -Wl,-soname,$(LIBNAME).so.1 -o ../$(LIBNAME).$(ONPOSIX_VERSION) $(OBJECTS) -lpthread -lrt
 	ln -f -s $(LIBNAME).$(ONPOSIX_VERSION) ../$(LIBNAME).so
-
-../test: test.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o ../test test.o $(OBJECTS) -lpthread -lrt
-
-test.o: $(INCLUDES) test.cpp
 
 Buffer.o: $(INCLUDES)
 
@@ -54,4 +47,5 @@ Pipe.o: $(INCLUDES)
 .PHONY: clean
 
 clean:
-	-rm -fr *.o ../$(LIBNAME)* ../test
+	-rm -fr *.o ../$(LIBNAME)* 
+

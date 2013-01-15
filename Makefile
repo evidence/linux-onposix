@@ -1,24 +1,38 @@
-ONPOSIX_VERSION=1.2
-export ONPOSIX_VERSION
-LIBNAME = libonposix
-.PHONY: all clean install doc
+export LIBNAME=libonposix
+export ONPOSIX_VERSION=1.2
+export CXX = g++
+export CXXFLAGS = -O3 -Wall -Wextra -fPIC
 
-all:
+.PHONY: clean install doc
+
+## Add googletest information for unit testing:
+export GTEST_INCLUDE_DIR=~/googletest/include
+export GTEST_LIB_DIR=~/googletest/lib
+
+$(LIBNAME).so $(LIBNAME).a:
 	$(MAKE) -C src
 
-ifeq ($(strip $(TARGET_DIR)),)
 install:
+ifeq ($(strip $(TARGET_DIR)),)
 	sudo cp -f -a $(LIBNAME)* /usr/lib/ 
 else
-install:
 	cp -f -a $(LIBNAME)* $(TARGET_DIR)/usr/lib/ 
 endif
+
+ifeq ($(strip $(GTEST_INCLUDE_DIR)),)
+test:
+	@echo "Missing information about google test directories"
+	@echo "Please set GTEST_INCLUDE_DIR and GTEST_LIB_DIR"
+else
+test: $(LIBNAME).so $(LIBNAME).a
+	$(MAKE) -C tests
+endif
+
+doc:
+	$(MAKE) -C doc
 
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc clean
-	-rm -f index.html
+	$(MAKE) -C tests clean
 
-doc:
-	$(MAKE) -C doc
-	ln -s -f doc/html/index.html index.html
