@@ -1,5 +1,5 @@
 export LIBNAME=libonposix
-export ONPOSIX_VERSION=1.2
+export ONPOSIX_VERSION=1.3
 export CXX = g++
 export CXXFLAGS = -O3 -Wall -Wextra -fPIC
 
