@@ -37,22 +37,32 @@
  * <br>
  * <h1>Introduction</h1>
  *
- * OnPosix is a tiny C++ library to abstract POSIX features to C++
+ * OnPosix is a tiny library to abstract POSIX mechanisms to C++
  * developers.<br>
  * <br>
  * Most features offered by this library can be found either inside the
  * <a href="http://www.boost.org" target="_blank">Boost library</a>
- * or in a standard library compliant with the C++11 standard.<br>
+ * or in a standard library compliant with the
+ * <a href="http://www.stroustrup.com/C++11FAQ.html">C++11 standard</a>.<br>
  * Unfortunately, however, for some embedded Linux devices, these libraries
  * cannot represent viable solutions, due to the lack of memory space
  * (for the Boost libraries) and the lack of a new C++ compiler
  * (e.g., on Xilinx MicroBlaze).
  * On these platforms, the OnPosix library represents a good and cheap solution
- * to have object-oriented mechanisms on POSIX platforms.<br>
+ * to have object-oriented POSIX mechanisms.<br>
  * <br>
  * The library is available both as a shared (.so) and a static
  * (.a) library. 
  * 
+ *
+ * <br>
+ * <br>
+ * <br>
+ * <h1>License</h1>
+ *
+ * The library is licensed under version 2 of the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html">GNU LIBRARY GENERAL PUBLIC LICENSE (LGPL)</a>.<br>
+ * See file LICENSE for more details.
+ *
  * <br>
  * <br>
  * <br>
@@ -64,7 +74,7 @@
  * \endcode
  *
  * or <a href="http://sourceforge.net/projects/onposix/files/">
- * download from Sourceforge</a>.
+ * download a zip archive from Sourceforge</a>.
  *
  * <br>
  * <br>
@@ -90,10 +100,20 @@
  * make TARGET_DIR=/absolute/path install
  * \endcode
  *
- * To generate the documentation using Doxygen, type
+ * Documentation is created through <a href="http://www.doxygen.org">Doxygen</a>.
+ * To generate the documentation, type
  *
  * \code
  * make doc
+ * \endcode
+ *
+ *
+ * Unit testing is done through the <a href="http://code.google.com/p/googletest/">Google C++ Testing Framework</a>.
+ * To test the library, specify the googletest path by setting the GTEST_INCLUDE_DIR and GTEST_LIB_DIR variables in the Makefile and type
+ *
+ * \code
+ * make test
+ * ./test
  * \endcode
  *
  * <br>
@@ -103,6 +123,11 @@
  * Some examples about the characteristics offered by the library:
  *
  * <h2>Threads</h2>
+ *
+ * The library offers basic mechanisms to create, start and stop a thread.<br>
+ * It makes also possible to set scheduling parameters, thread affinity and signal handling.<br>
+ * For threads, inherit a class from AbstractThread and specify a run() method.
+ * Here we provide a small example. Information about all available methods can be found in the \ref onposix::AbstractThread class.<br>
  *
  * \code
  * class MyThread: public AbstractThread {
@@ -156,6 +181,12 @@
  *
  * <h2>Socket descriptors</h2>
  *
+ * The library offers mechanisms for both connection-oriented (e.g., TCP) and connection-less (e.g., UDP) communications.
+ * Communications can be either AF_UNIX or AF_INET.
+ * Here is a small example about a TCP client-server application.
+ * More information can be found in the description of classes \ref onposix::StreamSocketServer, \ref onposix::StreamSocketServerDescriptor,
+ * \ref onposix::StreamSocketClientDescriptor, \ref onposix::DgramSocketClientDescriptor and \ref onposix::DgramSocketServerDescriptor.<br>
+ *
  * Server-side:
  * \code
  * int port = 1234;
@@ -185,8 +216,23 @@
  * p.close();
  * \endcode
  *
+ *
+ * <h2>FIFOs (AKA "named pipes")</h2>
+ *
+ * \code
+ * FifoDescriptor fd ("/tmp/myfifo", O_RDONLY);
+ * Buffer b (10);
+ * fd.read (b, b.getSize());
+ * \endcode
+ *
+ *
+ *
  * <h2>Logging</h2>
  *
+ * The whole library is built on top of a Logger that must be inizialized at the very beginning.
+ * Log messages can be printed to console and/or to a file with different thresholds
+ * of "verbosity".
+ * 
  * \code
  * DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
  * DEBUG(DBG_DEBUG, "hello " << "world");
@@ -231,12 +277,17 @@
  *  \endcode
  *
  *
+ * <h2>Much more...</h2>
+ *
+ * The library also offer Observer designer pattern on descriptors (i.e., \ref onposix::DescriptorsMonitor), buffers (i.e., \ref onposix::Buffer)
+ * and shared queues (i.e., \ref onposix::PosixSharedQueue and \ref onposix::PosixPrioritySharedQueue).
+ *
  * <br>
  * <br>
  * <h1>Support</h1>
  *
  * A <a href="http://sourceforge.net/p/onposix/mailman/">mailing list</a>
- * is available on Sourceforge.
+ * is available on Sourceforge. Fell free to propose feedback, new features and possible improvements.
  */
 
 

@@ -26,7 +26,7 @@
 namespace onposix {
 
 /**
- * \brief Abstraction of a fifo (AKA named pipe) descriptor.
+ * \brief Abstraction of a fifo (AKA "named pipe") descriptor.
  *
  * This is an abstract class for the concept of fifo.
  * The descriptor corresponds to an open fifo.
