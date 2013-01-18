@@ -378,14 +378,7 @@ TEST_F (LoggerTest, ScreenAndFilePrint)
 //   BUFFER
 // ======================================================================
 
-class BufferTest: public ::testing::Test {
-protected:
-// 	Buffer b3;
-// public:
-// 	BufferTest(): b3(100){}
-};
-
-TEST_F (BufferTest, Size0)
+TEST (BufferTest, Size0)
 {
 	// Buffer with size 0
 	bool catched = false;
@@ -398,7 +391,7 @@ TEST_F (BufferTest, Size0)
 		<< "ERROR: Exception of 0-size buffer not thrown!";
 }
 
-TEST_F (BufferTest, Size0New)
+TEST (BufferTest, Size0New)
 {
 	// Buffer with size 0 (with new)
 	bool catched = false;
@@ -412,7 +405,7 @@ TEST_F (BufferTest, Size0New)
 }
 
 
-TEST_F (BufferTest, Size)
+TEST (BufferTest, Size)
 {
 	// Right size;
 	bool catched = false;
@@ -440,7 +433,7 @@ TEST_F (BufferTest, Size)
 		<< "ERROR: exeption thrown";
 }
 
-TEST_F (BufferTest, OutOfBoundaryChar)
+TEST (BufferTest, OutOfBoundaryChar)
 {
 	// Out of boundary
 	bool catched = false;
@@ -456,7 +449,7 @@ TEST_F (BufferTest, OutOfBoundaryChar)
 		<< "ERROR: exception not thrown about exceeding buffer size";
 }
 
-TEST_F (BufferTest, RightSize)
+TEST (BufferTest, RightSize)
 {
 	// Right size (with new);
 	bool catched = false;
@@ -475,7 +468,7 @@ TEST_F (BufferTest, RightSize)
 }
 
 
-TEST_F (BufferTest, OutOfBoundaryString)
+TEST (BufferTest, OutOfBoundaryString)
 {
 	// Out of boundary
 	bool catched = false;
@@ -492,7 +485,7 @@ TEST_F (BufferTest, OutOfBoundaryString)
 		<< "ERROR: exception not twhrown when going over the buffer limit";
 }
 
-TEST_F (BufferTest, Comparison)
+TEST (BufferTest, Comparison)
 {
 	// Compare
 	bool catched = false;
@@ -525,16 +518,10 @@ TEST_F (BufferTest, Comparison)
 // ======================================================================
 
 
-class FifoDescriptorTest: public ::testing::Test {
-protected:
-	FifoDescriptor fd;
-public:
-	FifoDescriptorTest(): fd("/tmp/test-fifo-1", O_WRONLY|O_CREAT, S_IRWXU) {}
-};
-
-TEST_F (FifoDescriptorTest, MainTest)
+TEST (FifoDescriptorTest, MainTest)
 {
 	unlink("/tmp/test-fifo-1");
+	FifoDescriptor fd("/tmp/test-fifo-1", O_WRONLY|O_CREAT, S_IRWXU);
 	std::cout << "\t\tFifo size: " << fd.getCapacity() << std::endl;
 }
 
@@ -544,11 +531,7 @@ TEST_F (FifoDescriptorTest, MainTest)
 // ======================================================================
 
 
-class FileDescriptorTest: public ::testing::Test {
-protected: 
-};
-
-TEST_F (FileDescriptorTest, WriteWhenNotExisting)
+TEST (FileDescriptorTest, WriteWhenNotExisting)
 {
 	unlink("/tmp/test-file-1");
 
@@ -562,7 +545,7 @@ TEST_F (FileDescriptorTest, WriteWhenNotExisting)
 		<< "ERROR: exception not thrown for write only on not existing file";
 }
 
-TEST_F (FileDescriptorTest, CreateUsage)
+TEST (FileDescriptorTest, CreateUsage)
 {
 	bool catched = false;
 	try {
@@ -580,7 +563,7 @@ TEST_F (FileDescriptorTest, CreateUsage)
 		<< "ERROR: exception thrown when using O_CREAT";
 }
 
-TEST_F (FileDescriptorTest, AppendUsage)
+TEST (FileDescriptorTest, AppendUsage)
 {
 	bool catched = false;
 	try {
@@ -595,7 +578,7 @@ TEST_F (FileDescriptorTest, AppendUsage)
 		<< "ERROR: exception thrown when using O_APPEND";
 }
 
-TEST_F (FileDescriptorTest, ReadOnly)
+TEST (FileDescriptorTest, ReadOnly)
 {
 	bool catched = false;
 	try {
@@ -631,14 +614,7 @@ public:
  };
 
 
-
-
-class ThreadTest: public ::testing::Test {
-protected:
-public:
-};
-
-TEST_F (ThreadTest, StartStop)
+TEST (ThreadTest, StartStop)
 {
 	MyThread t;
 	t.invoked_ = false;
@@ -653,7 +629,7 @@ TEST_F (ThreadTest, StartStop)
 
 
 #ifdef ONPOSIX_LINUX_SPECIFIC
-TEST_F (ThreadTest, Affinity)
+TEST (ThreadTest, Affinity)
 {
 	MyThread t;
 	ASSERT_TRUE(t.start())
@@ -674,7 +650,7 @@ TEST_F (ThreadTest, Affinity)
 }
 #endif /* ONPOSIX_LINUX_SPECIFIC */
 
-TEST_F (ThreadTest, SchedParam)
+TEST (ThreadTest, SchedParam)
 {
 	MyThread t;
 	ASSERT_TRUE(t.start())
@@ -745,11 +721,8 @@ class SocketReader: public AbstractDescriptorReader {
 	}
  };
 
-class ThreadSockTest: public ::testing::Test {
-protected:
-};
 
-TEST_F (ThreadSockTest, MainTest) {
+TEST (ThreadSockTest, MainTest) {
 	unlink("/tmp/test-socket");
 	StreamSocketServer serv("/tmp/test-socket");
 	MyThreadSock t;
@@ -769,11 +742,7 @@ TEST_F (ThreadSockTest, MainTest) {
 //   TIME 
 // ======================================================================
 
-class TimeTest: public ::testing::Test {
-protected:
-};
-
-TEST_F (TimeTest, MainTest)
+TEST (TimeTest, MainTest)
 {
 	Time a;
 	Time b;
@@ -782,7 +751,7 @@ TEST_F (TimeTest, MainTest)
 }
 
 
-TEST_F (TimeTest, ResetTime)
+TEST (TimeTest, ResetTime)
 {
 	Time a;
 	Time b;
@@ -792,7 +761,7 @@ TEST_F (TimeTest, ResetTime)
 }
 
 
-TEST_F (TimeTest, OperatorEqEq)
+TEST (TimeTest, OperatorEqEq)
 {
 	Time a;
 	Time b;
