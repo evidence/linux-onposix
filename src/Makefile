@@ -9,8 +9,8 @@ all: ../$(LIBNAME).a ../$(LIBNAME).so
 	ar rcs ../$(LIBNAME).a $(OBJECTS)
 
 ../$(LIBNAME).so: $(OBJECTS)
-	$(CXX) $(CFLAGS) -shared -Wl,-soname,$(LIBNAME).so.1 -o ../$(LIBNAME).$(ONPOSIX_VERSION) $(OBJECTS) -lpthread -lrt
-	ln -f -s $(LIBNAME).$(ONPOSIX_VERSION) ../$(LIBNAME).so
+	$(CXX) $(CFLAGS) -shared -Wl,-soname,$(LIBNAME).so -o ../$(LIBNAME).so.$(ONPOSIX_VERSION) $(OBJECTS) -lpthread -lrt
+	ln -f -s $(LIBNAME).so.$(ONPOSIX_VERSION) ../$(LIBNAME).so
 
 Buffer.o: $(INCLUDES)
 
