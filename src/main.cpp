@@ -60,7 +60,14 @@
  * <br>
  * <h1>License</h1>
  *
- * The library is licensed under version 2 of the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html">GNU LIBRARY GENERAL PUBLIC LICENSE (LGPL)</a>.<br>
+ * The library has been developed in the context of the
+ * <a href="http://www.era-project.org">ERA</a> project, financially supported
+ * by the European commission under the FP7 program.
+ * <br>
+ * <br>
+ * The library is licensed under version 2 of the
+ * <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html">GNU LIBRARY
+ * GENERAL PUBLIC LICENSE (LGPL)</a>.<br>
  * See file LICENSE for more details.
  *
  * <br>
