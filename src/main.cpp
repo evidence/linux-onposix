@@ -182,7 +182,7 @@
  * \code
  * FileDescriptor fd ("/tmp/myfile", O_RDONLY);
  * Buffer b (10);
- * fd.read (b, b.getSize());
+ * fd.read (&b, b.getSize());
  * fd.close();
  * \endcode
  *
@@ -201,7 +201,7 @@
  * while (true) {
  *	StreamSocketServerDescriptor des (serv);
  *	Buffer b (10);
- *	des.read(b, b.getSize());
+ *	des.read(&b, b.getSize());
  *	// ...
  * }
  * \endcode
@@ -212,14 +212,15 @@
  * std::string address = "192.168.10.133";
  * StreamSocketClientDescriptor des(address, port);
  * Buffer b (10);
- * des.write(b, b.getSize());
+ * des.write(&b, b.getSize());
  * \endcode
  *
  * <h2>Pipes</h2>
  *
  * \code
  * Pipe p;
- * p.read(b, b.getSize());
+ * Buffer b (10);
+ * p.read(&b, b.getSize());
  * p.close();
  * \endcode
  *
@@ -229,7 +230,7 @@
  * \code
  * FifoDescriptor fd ("/tmp/myfifo", O_RDONLY);
  * Buffer b (10);
- * fd.read (b, b.getSize());
+ * fd.read (&b, b.getSize());
  * \endcode
  *
  *
