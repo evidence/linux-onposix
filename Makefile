@@ -12,7 +12,7 @@ export GTEST_LIB_DIR=~/googletest/lib
 $(LIBNAME).so $(LIBNAME).a:
 	$(MAKE) -C src
 
-install:
+install: $(LIBNAME).so $(LIBNAME).a
 ifeq ($(strip $(TARGET_DIR)),)
 	sudo cp -f -a $(LIBNAME)* /usr/lib/ 
 else
