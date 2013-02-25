@@ -69,7 +69,7 @@ namespace onposix {
  * 		std::cerr << ret << "bytes read" << std::endl;
  * 		if (descriptor.getDescriptorNumber() !=
  *		    fd_.getDescriptorNumber())
- * 			DEBUG(DBG_ERROR, "Called with wrong descriptor!");
+ * 			DEBUG(ERROR, "Called with wrong descriptor!");
  * 	}
  * };
  * \endcode

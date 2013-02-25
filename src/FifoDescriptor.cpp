@@ -49,7 +49,7 @@ FifoDescriptor::FifoDescriptor(const std::string& name,const  int flags)
 {
 		fd_ = open(name.c_str(), flags);
 		if (fd_ <= 0) {
-			DEBUG(DBG_ERROR, "Error opening fifo " << name);
+			DEBUG(ERROR, "Error opening fifo " << name);
 			throw std::runtime_error ("Open fifo error");
 		}
 }
@@ -95,7 +95,7 @@ FifoDescriptor::FifoDescriptor(const std::string& name, const int flags,
 {
 		fd_ = open(name.c_str(), flags, mode);
 		if (fd_ <= 0) {
-			DEBUG(DBG_ERROR, "Error opening fifo " << name);
+			DEBUG(ERROR, "Error opening fifo " << name);
 			throw std::runtime_error ("Open fifo error");
 		}
 }
@@ -114,7 +114,7 @@ int FifoDescriptor::getCapacity()
 	errno = 0;
 	if ((v = fpathconf(fd_,_PC_PIPE_BUF)) == -1)
 		if (errno != 0) {
-			DEBUG(DBG_ERROR, "Error: can't get fifo capacity");
+			DEBUG(ERROR, "Error: can't get fifo capacity");
 			throw std::runtime_error ("Fifo capacity error");
 			return -1;
 		}

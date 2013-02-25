@@ -34,7 +34,7 @@ StreamSocketServerDescriptor::StreamSocketServerDescriptor(const StreamSocketSer
 {
 	fd_ = accept(socket.getDescriptorNumber(), NULL, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error in accept()!");
+		DEBUG(ERROR, "Error in accept()!");
 		throw std::runtime_error("Accept error");
 	}
 }

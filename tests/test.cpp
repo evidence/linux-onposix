@@ -49,146 +49,123 @@ class LoggerTest: public ::testing::Test {
 public:
 	~LoggerTest(){
 		// Disable further printing
-		DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_off, DBG_ERROR, DBG_ERROR);
+		DEBUG_CONF("/tmp/test-logger", OFF, OFF);
 	}
 };
-
-TEST_F (LoggerTest, NotYetConfigured)
-{
-	// Not configured Logger
-	DEBUG(DBG_ERROR, "Message");
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
-		<< "Logger: error 1";
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
-		<< "Logger: error 2";
-
-	DEBUG(DBG_WARN, "Message");
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
-		<< "Logger: error 3";
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
-		<< "Logger: error 4";
-
-	DEBUG(DBG_DEBUG, "Message");
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
-		<< "Logger: error 5";
-	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
-		<< "Logger: error 6";
-}
-
 
 TEST_F (LoggerTest, NoPrintConfigured)
 {
 	// Configured to print nothing
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_off, DBG_DEBUG, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", OFF, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 7";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 8";
 
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 9";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 10";
 
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 11";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 12";
 
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 13";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 14";
 
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_ERROR, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", ERROR, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 15";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 16";
 	
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 17";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 18";
 	
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 19";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 20";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_WARN, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", WARN, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 21";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 22";
 	
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 23";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 24";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
+	DEBUG_CONF("/tmp/test-logger", OFF, ERROR);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 25";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 26";
 
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 27";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 28";
 	
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 29";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 30";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_WARN);
+	DEBUG_CONF("/tmp/test-logger", OFF, WARN);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 31";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 32";
 
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 33";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 34";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_ERROR, DBG_ERROR);
+	DEBUG_CONF("/tmp/test-logger", ERROR, ERROR);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 35";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 36";
 
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 37";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 38";
 	
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 39";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 40";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_WARN, DBG_WARN);
+	DEBUG_CONF("/tmp/test-logger", WARN, WARN);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 41";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 42";
 
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 43";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
@@ -200,55 +177,55 @@ TEST_F (LoggerTest, NoPrintConfigured)
 TEST_F (LoggerTest, OnlyFilePrint)
 {
 	// PRINT ONLY ON FILE
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_DEBUG, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", DEBUG, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 45";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 46";
 
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 47";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 48";
 
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 49";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 50";
 
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 51";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 52";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_WARN, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", WARN, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 53";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 54";
 	
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 55";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 56";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 57";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 58";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_off, DBG_ERROR, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", ERROR, OFF);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 59";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 60";
 
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 61";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
@@ -259,55 +236,55 @@ TEST_F (LoggerTest, OnlyFilePrint)
 TEST_F (LoggerTest, OnlyScreenPrint)
 {
 	// PRINT ONLY ON SCREEN
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", OFF, DEBUG);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 63";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 64";
 
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 65";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 66";
 
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 67";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 68";
 
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 69";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 70";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_WARN);
+	DEBUG_CONF("/tmp/test-logger", OFF, WARN);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 71";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 72";
 	
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 73";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 74";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 75";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 76";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_off|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
+	DEBUG_CONF("/tmp/test-logger", OFF, ERROR);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 77";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 78";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 79";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
@@ -317,55 +294,55 @@ TEST_F (LoggerTest, OnlyScreenPrint)
 TEST_F (LoggerTest, ScreenAndFilePrint)
 {
 	// PRINT ON SCREEN AND FILE
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", DEBUG, DEBUG);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 81";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 82";
 	
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 83";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 84";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 85";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 86";
 	
-	DEBUG(DBG_DEBUG, "Message");
+	DEBUG(DEBUG, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 87";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 88";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_WARN, DBG_WARN);
+	DEBUG_CONF("/tmp/test-logger", WARN, WARN);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 89";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 90";
 	
-	DEBUG(DBG_WARN, "Message");
+	DEBUG(WARN, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 91";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 92";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 93";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 94";
 
-	DEBUG_CONF("/tmp/test-logger", Logger::file_on|Logger::screen_on, DBG_ERROR, DBG_DEBUG);
+	DEBUG_CONF("/tmp/test-logger", ERROR, DEBUG);
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 95";
 	ASSERT_FALSE(Logger::getInstance().latestMsgPrintedOnScreen())
 		<< "Logger: error 96";
 	
-	DEBUG(DBG_ERROR, "Message");
+	DEBUG(ERROR, "Message");
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnFile())
 		<< "Logger: error 97";
 	ASSERT_TRUE(Logger::getInstance().latestMsgPrintedOnScreen())

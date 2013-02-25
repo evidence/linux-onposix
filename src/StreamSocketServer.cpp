@@ -39,7 +39,7 @@ StreamSocketServer::StreamSocketServer(const std::string& name,
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating socket");
+		DEBUG(ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
 	}
 
@@ -51,14 +51,14 @@ StreamSocketServer::StreamSocketServer(const std::string& name,
 	    sizeof(serv_addr.sun_path) - 1);
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when binding socket");
+		DEBUG(ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
 	}
 
 	// listen()
 	if (listen(fd_, maxPendingConnections) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when listening");
+		DEBUG(ERROR, "Error when listening");
 		throw std::runtime_error ("Listen error");
 	}
 }
@@ -78,7 +78,7 @@ StreamSocketServer::StreamSocketServer(const uint16_t port, int maxPendingConnec
 	// socket()
 	fd_ = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating socket");
+		DEBUG(ERROR, "Error when creating socket");
 		throw std::runtime_error ("Socket error");
 	}
 
@@ -90,14 +90,14 @@ StreamSocketServer::StreamSocketServer(const uint16_t port, int maxPendingConnec
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when binding socket");
+		DEBUG(ERROR, "Error when binding socket");
 		throw std::runtime_error ("Bind error");
 	}
 
 	// listen()
 	if (listen(fd_, maxPendingConnections) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when listening");
+		DEBUG(ERROR, "Error when listening");
 		throw std::runtime_error ("Listen error");
 	}
 }

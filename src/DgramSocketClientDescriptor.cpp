@@ -39,7 +39,7 @@ DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& name
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating client socket");
+		DEBUG(ERROR, "Error when creating client socket");
 		throw std::runtime_error ("Client socket error");
 	}
 
@@ -51,7 +51,7 @@ DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& name
 	if (connect(fd_, (struct sockaddr *) &serv_addr,
 	                                sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when creating client socket");
+		DEBUG(ERROR, "Error when creating client socket");
 		throw std::runtime_error ("Client socket error");
 	}
 }
@@ -69,7 +69,7 @@ DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& addr
 	// socket()
 	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(DBG_ERROR, "Error when creating client socket");
+		DEBUG(ERROR, "Error when creating client socket");
 		throw std::runtime_error ("Client socket error");
 	}
 
@@ -86,7 +86,7 @@ DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& addr
 	if (connect(fd_, (struct sockaddr *) &serv_addr,
 	                                sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(DBG_ERROR, "Error when creating client socket");
+		DEBUG(ERROR, "Error when creating client socket");
 		throw std::runtime_error ("Client socket error");
 	}
 

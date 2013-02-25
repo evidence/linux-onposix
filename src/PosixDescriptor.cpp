@@ -38,7 +38,7 @@ int PosixDescriptor::__read (void* buffer, size_t size)
 {
 	size_t remaining = size;
 	while (remaining > 0) {
-		//DEBUG(DBG_DEBUG, "Number " << remaining << " bytes left to read");
+		//DEBUG(DEBUG, "Number " << remaining << " bytes left to read");
 		ssize_t ret = ::read (fd_, ((char*)buffer)+(size-remaining), remaining);
 		if (ret == 0)
 			// End of file reached
@@ -65,7 +65,7 @@ int PosixDescriptor::__read (void* buffer, size_t size)
 int PosixDescriptor::read (Buffer* b, size_t size)
 {
 	if (b->getSize() == 0 || size > b->getSize()) {
-		DEBUG(DBG_ERROR, "Buffer size not enough!");
+		DEBUG(ERROR, "Buffer size not enough!");
 		return -1;
 	}
 	return __read(b->getBuffer(), size);
@@ -104,7 +104,7 @@ int PosixDescriptor::__write (const void* buffer, size_t size)
 {
 	size_t remaining = size;
 	while (remaining > 0) {
-		//DEBUG(DBG_DEBUG, "Number " << remaining << " bytes left to read");
+		//DEBUG(DEBUG, "Number " << remaining << " bytes left to read");
 		ssize_t ret = ::write (fd_, ((char*)buffer)+(size-remaining), remaining);
 		if (ret == 0)
 			// Cannot write more
@@ -130,7 +130,7 @@ int PosixDescriptor::__write (const void* buffer, size_t size)
 int PosixDescriptor::write (Buffer* b, size_t size)
 {
 	if (b->getSize() == 0 || size > b->getSize()) {
-		DEBUG(DBG_ERROR, "Buffer size not enough!");
+		DEBUG(ERROR, "Buffer size not enough!");
 		return -1;
 	}
 	return __write(reinterpret_cast<const void*> (b->getBuffer()), size);

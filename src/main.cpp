@@ -237,15 +237,15 @@
  *
  * <h2>Logging</h2>
  *
- * The whole library is built on top of a Logger that must be inizialized at the very beginning.
- * Log messages can be printed to console and/or to a file with different thresholds
- * of "verbosity".
+ * The whole library is built on top of a Logger.
+ * Log messages can be printed to console and/or to a file with different
+ * severity levels.
  * 
  * \code
- * DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
- * DEBUG(DBG_DEBUG, "hello " << "world");
- * DEBUG(DBG_WARN, "something " << "strange");
- * DEBUG(DBG_ERR, "this is an error");
+ * DEBUG_CONF("outputfile", DEBUG, ERROR);
+ * DEBUG(DEBUG, "hello " << "world");
+ * DEBUG(WARN, "something " << "strange");
+ * DEBUG(ERR, "this is an error");
  * \endcode
  *
  * <h2>Timing</h2>

@@ -37,26 +37,30 @@
 
 namespace onposix {
 
-const int DBG_ERROR	= 0;
-const int DBG_WARN	= 1;
-const int DBG_DEBUG	= 2;
+enum severity_level_t {
+	OFF 	= 0,
+	ERROR	= 1,
+	WARN	= 2,
+	DEBUG	= 3};
 
 /**
  * \brief Macro to configure the logger.
  *
+ * @param Base name of the file used for logging (e.g. "/tmp/myproject")
+ * @param File severity level (i.e., OFF, ERROR, WARN, DEBUG)
+ * @param Console severity level (i.e., OFF, ERROR, WARN, DEBUG)
+ *
  * Example of configuration of the Logger: *
  * \code
- * 	DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
+ * 	DEBUG_CONF("outputfile", DEBUG, ERROR);
  * \endcode
  */
 #define DEBUG_CONF(outputFile, \
-		configuration, \
-		fileVerbosityLevel, \
-		screenVerbosityLevel) { \
+		fileSeverityLevel, \
+		screenSeverityLevel) { \
 			Logger::getInstance().configure(outputFile, \
-						configuration, \
-						fileVerbosityLevel, \
-						screenVerbosityLevel); \
+						fileSeverityLevel, \
+						screenSeverityLevel); \
 		}
 
 /**
@@ -64,7 +68,7 @@ const int DBG_DEBUG	= 2;
  *
  * Example of usage of the Logger:
  * \code
- * 	DEBUG(DBG_DEBUG, "hello " << "world");
+ * 	DEBUG(DEBUG, "hello " << "world");
  * \endcode
  */
 #define DEBUG(priority, msg) { \
@@ -84,28 +88,32 @@ const int DBG_DEBUG	= 2;
  * This is the implementation of a simple logger in C++. It is implemented 
  * as a Singleton, so it can be easily called through two DEBUG macros.
  * It is Pthread-safe.
- * It allows to log on both file and screen, and to specify a verbosity
- * threshold for both of them.
+ * It allows to log on both file and screen, and to specify a severity level
+ * for both.
  *
  * Example of configuration of the Logger: *
  * \code
- * 	DEBUG_CONF("outputfile", Logger::file_on|Logger::screen_on, DBG_DEBUG, DBG_ERROR);
+ * 	DEBUG_CONF("outputfile", DEBUG, ERROR);
  * \endcode
  *
  * Example of usage of the Logger:
  * \code
- * 	DEBUG(DBG_DEBUG, "hello " << "world");
+ * 	DEBUG(DEBUG, "hello " << "world");
  * \endcode
  */
 class Logger
 {
-	/**
-	 * \brief Type used for the configuration
+	/* \brief Current severity level for logging on file.
+	 *
+	 * It can be OFF, DEBUG, WARN or ERROR.
 	 */
-	enum loggerConf_	{L_nofile_	= 	1 << 0,
-				L_file_		=	1 << 1,
-				L_noscreen_	=	1 << 2,
-				L_screen_	=	1 << 3};
+	severity_level_t fileSeverityLevel_;
+
+	/* \brief Current severity level for logging on screen.
+	 *
+	 * It can be OFF, DEBUG, WARN or ERROR.
+	 */
+	severity_level_t screenSeverityLevel_;
 
 #ifdef LOGGER_MULTITHREAD
 	/**
@@ -114,8 +122,6 @@ class Logger
 	static PosixMutex lock_;
 #endif
 	
-	bool configured_;
-
 	/**
 	 * \brief Pointer to the unique Logger (i.e., Singleton)
 	 */
@@ -128,15 +134,6 @@ class Logger
 	std::string logFile_;
 
 	/**
-	 * \brief Current configuration of the logger.
-	 * Variable to know if logging on file and on screen are enabled.
-	 * Note that if the log on file is enabled, it means that the
-	 * logger has been already configured, therefore the stream is
-	 * already open.
-	 */
-	loggerConf_ configuration_;
-
-	/**
 	 * \brief Stream used when logging on a file
 	 */
 	std::ofstream out_;
@@ -147,22 +144,14 @@ class Logger
 	struct timeval initialTime_;
 
 	/**
-	 * \brief Verbosity threshold for files
-	 */
-	unsigned int fileVerbosityLevel_;
-
-	/**
-	 * \brief Verbosity threshold for screen
-	 */
-	unsigned int screenVerbosityLevel_;
-
-	/**
-	 * \brief Debug: to know if the latest message has been printed on file.
+	 * \brief Debug: to know if the latest message has been printed
+	 * on file.
 	 */
 	bool latestMsgPrintedOnFile_;
 
 	/**
-	 * \brief Debug: to know if the latest message has been printed on screen.
+	 * \brief Debug: to know if the latest message has been printed 
+	 * on screen.
 	 */
 	bool latestMsgPrintedOnScreen_;
 
@@ -181,50 +170,34 @@ class Logger
 
 public:
 
-	typedef loggerConf_ loggerConf;
-	static const loggerConf file_on= 	L_nofile_;
-	static const loggerConf file_off= 	L_file_;
-	static const loggerConf screen_on= 	L_noscreen_;
-	static const loggerConf screen_off=	L_screen_;
-
 	static Logger& getInstance();
 
-	void print(const unsigned int		verbosityLevel,
+	void print(const severity_level_t	severityLevel,
 			const std::string&	sourceFile,
 			const int 		codeLine,
 			const std::string& 	message);
 
 	void configure (const std::string&	outputFile,
-			const loggerConf	configuration,
-			const int		fileVerbosityLevel,
-			const int		screenVerbosityLevel);
+			const severity_level_t	fileSeverityLevel,
+			const severity_level_t	screenSeverityLevel);
 
 	/**
 	 * \brief Method to know if the latest message has been printed on file
 	 * @return true if it has been printed; false otherwise
 	 */
-	inline bool latestMsgPrintedOnFile() const {return latestMsgPrintedOnFile_;}
+	inline bool latestMsgPrintedOnFile() const {
+		return latestMsgPrintedOnFile_;
+	}
 
 	/**
 	 * \brief Method to know if the latest message has been printed on file
 	 * @return true if it has been printed; false otherwise
 	 */
-	inline bool latestMsgPrintedOnScreen() const {return latestMsgPrintedOnScreen_;}
+	inline bool latestMsgPrintedOnScreen() const {
+		return latestMsgPrintedOnScreen_;
+	}
 
 };
-
-inline Logger::loggerConf operator|
-	(Logger::loggerConf __a, Logger::loggerConf __b)
-{
-	return Logger::loggerConf(static_cast<int>(__a) |
-		static_cast<int>(__b));
-}
-
-inline Logger::loggerConf operator&
-	(Logger::loggerConf __a, Logger::loggerConf __b)
-{
-	return Logger::loggerConf(static_cast<int>(__a) &
-		static_cast<int>(__b)); }
 
 } /* onposix */
 

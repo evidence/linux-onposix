@@ -60,7 +60,8 @@ inline void Logger::unlock(){}
  * configure() method.
  */
 Logger::Logger():
-		configured_(false),
+		fileSeverityLevel_(OFF),
+		screenSeverityLevel_(ERROR),
 		latestMsgPrintedOnFile_(false),
 		latestMsgPrintedOnScreen_(false)
 {
@@ -73,23 +74,19 @@ Logger::Logger():
  * Then, in case, it is open again in append mode.
  * @param outputFile Name of the file used for logging
  * @param configuration Configuration (i.e., log on file and on screen on or off)
- * @param fileVerbosityLevel Verbosity threshold for file
- * @param screenverbosityLevel Verbosity threshold for screen
+ * @param fileSeverityLevel Severity threshold for file
+ * @param screenSeverityLevel Severity threshold for screen
  */
 void Logger::configure (const std::string&	outputFile,
-			const loggerConf	configuration,
-			const int		fileVerbosityLevel,
-			const int		screenVerbosityLevel)
+			const severity_level_t	fileSeverityLevel,
+			const severity_level_t	screenSeverityLevel)
 {
 		Logger::lock();
 		latestMsgPrintedOnFile_ = false;
 		latestMsgPrintedOnScreen_ = false;
 
-		fileVerbosityLevel_ = fileVerbosityLevel;
-		screenVerbosityLevel_ = screenVerbosityLevel;
-
 		// Close the old stream, if needed
-		if (configuration_&file_on)
+		if ((fileSeverityLevel_ != OFF) && (fileSeverityLevel == OFF))
 			out_.close();
 
 		// Compute a new file name, if needed
@@ -109,11 +106,11 @@ void Logger::configure (const std::string&	outputFile,
 		}
 
 		// Open a new stream, if needed
-		if (configuration&file_on)
+		if ((fileSeverityLevel_ == OFF) && (fileSeverityLevel != OFF))
 			out_.open(logFile_.c_str(), std::ios::app);
 
-		configuration_ = configuration;
-		configured_ = true;
+		fileSeverityLevel_ = fileSeverityLevel;
+		screenSeverityLevel_ = screenSeverityLevel;
 
 		Logger::unlock();
 }
@@ -126,7 +123,7 @@ void Logger::configure (const std::string&	outputFile,
 Logger::~Logger()
 {
 	Logger::lock();
-	if (configuration_&file_on)
+	if (fileSeverityLevel_ != OFF)
 		out_.close();
 	delete m_;
 	Logger::unlock();
@@ -153,14 +150,14 @@ Logger& Logger::getInstance()
 /**
  * \brief Method used to print messages.
  * Called by the DEBUG() macro.
- * @param verbositylevel Priority of the message
+ * @param severitylevel Severity of the debug message
  * @param file Source file where the method has been called (set equal to __FILE__
  * 	      by the DEBUG macro)
  * @param line Number of line in the source code where the method has been
  * called (automatically set equal to __LINE__ by the DEBUG macro)
  * @param message Message to be logged
  */
-void Logger::print(const unsigned int verbosityLevel,
+void Logger::print(const severity_level_t severityLevel,
 					const std::string& file,
 					const int line,
 					const std::string& message)
@@ -173,22 +170,14 @@ void Logger::print(const unsigned int verbosityLevel,
 	latestMsgPrintedOnFile_ = false;
 	latestMsgPrintedOnScreen_ = false;
 
-
-	if (!configured_) {
-			std::cerr << "ERROR: Logger not configured!" << 
-				std::endl;
-			Logger::unlock();
-			return;
-	}
-
-	if ((configuration_&file_on) && (verbosityLevel <= fileVerbosityLevel_)){
+	if (fileSeverityLevel_ >= severityLevel){
 		out_ << "DEBUG [" << file << ":" << line << "] @ " <<
 		    (currentTime.tv_sec - initialTime_.tv_sec) <<
 		    ":" << message << std::endl;
 		latestMsgPrintedOnFile_ = true;
 	}
 
-	if ((configuration_&screen_on) && (verbosityLevel <= screenVerbosityLevel_)){
+	if (screenSeverityLevel_ >= severityLevel){
 		std::cerr << "DEBUG [" << file << ":" << line << "] @ "
 		    << (currentTime.tv_sec - initialTime_.tv_sec) <<
 		    ":" << message << std::endl;

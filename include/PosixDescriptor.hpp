@@ -111,7 +111,7 @@ public:
 	PosixDescriptor(const PosixDescriptor& src){
 		fd_ = ::dup(src.fd_);
 		if (fd_ < 0) {
-			DEBUG(DBG_ERROR, "Bad file descriptor");
+			DEBUG(ERROR, "Bad file descriptor");
 			throw std::runtime_error("PosixDescriptor: error in copy constructor");
 		}
 	}
@@ -129,7 +129,7 @@ public:
 	 */
 	PosixDescriptor& operator= (const PosixDescriptor& src){
 		if (::dup2(src.fd_, fd_) < 0) {
-			DEBUG(DBG_ERROR, "Bad file descriptor");
+			DEBUG(ERROR, "Bad file descriptor");
 			throw std::runtime_error("PosixDescriptor: error in operator=");
 		}
 		return *this;
