@@ -25,6 +25,7 @@
 #define _GNU_SOURCE
 #endif
 #include <pthread.h>
+#include <features.h>
 
 #include <vector>
 
@@ -140,10 +141,13 @@ public:
 	bool setSchedParam(int policy, int priority);
 	bool getSchedParam(int* policy, int* priority);
 
-#ifdef ONPOSIX_LINUX_SPECIFIC
+#if defined(ONPOSIX_LINUX_SPECIFIC) && defined(__GLIBC__) && \
+    ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ > 3)))
+
+#error pippo
 	void setAffinity(const std::vector<bool>& s);
 	void getAffinity(std::vector<bool>* v);
-#endif /* ONPOSIX_LINUX_SPECIFIC */
+#endif /* ONPOSIX_LINUX_SPECIFIC && GLIBC */
 };
 
 } /* onposix */

@@ -237,7 +237,8 @@ bool AbstractThread::getSchedParam(int* policy, int* priority)
 }
 
 
-#ifdef ONPOSIX_LINUX_SPECIFIC
+#if defined(ONPOSIX_LINUX_SPECIFIC) && defined(__GLIBC__) && \
+    ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ > 3)))
 /**
  * \brief Set CPU affinity
  *
@@ -290,7 +291,7 @@ void AbstractThread::getAffinity(std::vector<bool>* v)
 		(*v)[j] = false;
 	}
 }
-#endif /* ONPOSIX_LINUX_SPECIFIC */
+#endif /* ONPOSIX_LINUX_SPECIFIC && GLIBC */
 
 
 
