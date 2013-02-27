@@ -35,6 +35,7 @@
 #include <cassert>
 #include <iostream>
 
+// Uncomment to enable Linux-specific methods:
 // #define ONPOSIX_LINUX_SPECIFIC
 
 
@@ -605,7 +606,8 @@ TEST (ThreadTest, StartStop)
 }
 
 
-#ifdef ONPOSIX_LINUX_SPECIFIC
+#if defined(ONPOSIX_LINUX_SPECIFIC) && defined(__GLIBC__) && \
+    ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ > 3)))
 TEST (ThreadTest, Affinity)
 {
 	MyThread t;
@@ -625,7 +627,7 @@ TEST (ThreadTest, Affinity)
 	ASSERT_TRUE(t.stop())
 		<< "ERROR: can't stop the thread!";
 }
-#endif /* ONPOSIX_LINUX_SPECIFIC */
+#endif /* ONPOSIX_LINUX_SPECIFIC && GLIBC */
 
 TEST (ThreadTest, SchedParam)
 {

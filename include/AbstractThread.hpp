@@ -143,8 +143,6 @@ public:
 
 #if defined(ONPOSIX_LINUX_SPECIFIC) && defined(__GLIBC__) && \
     ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ > 3)))
-
-#error pippo
 	void setAffinity(const std::vector<bool>& s);
 	void getAffinity(std::vector<bool>* v);
 #endif /* ONPOSIX_LINUX_SPECIFIC && GLIBC */
