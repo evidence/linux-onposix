@@ -28,6 +28,9 @@
 
 #include <vector>
 
+// Uncomment to enable Linux-specific methods:
+#define ONPOSIX_LINUX_SPECIFIC
+
 namespace onposix {
 
 /**

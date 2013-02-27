@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/un.h>
@@ -36,6 +37,9 @@
 
 #include "Logger.hpp"
 #include "Buffer.hpp"
+
+// Uncomment to enable Linux-specific methods:
+#define ONPOSIX_LINUX_SPECIFIC
 
 namespace onposix {
 
@@ -135,6 +139,21 @@ public:
 		return *this;
 	}
 
+#ifdef ONPOSIX_LINUX_SPECIFIC
+	/**
+	 * \brief Ioctl on the file descriptor
+	 */
+	inline int ioctl(int request){
+		return ::ioctl(fd_, request);
+	}
+
+	/**
+	 * \brief Ioctl on the file descriptor
+	 */
+	inline int ioctl(int request, void* argp){
+		return ::ioctl(fd_, request, argp);
+	}
+#endif /* ONPOSIX_LINUX_SPECIFIC */
 };
 
 } /* onposix */
