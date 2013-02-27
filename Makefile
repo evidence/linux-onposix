@@ -3,7 +3,7 @@ export ONPOSIX_VERSION=1.3
 export CXX = g++
 export CXXFLAGS = -O3 -Wall -Wextra -fPIC
 
-.PHONY: clean install doc
+.PHONY: clean install doc $(LIBNAME).so $(LIBNAME).a
 
 ## Add googletest information for unit testing:
 export GTEST_INCLUDE_DIR=~/googletest/include
