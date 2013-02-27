@@ -106,8 +106,10 @@ bool AbstractThread::stop()
  */
 bool AbstractThread::waitForTermination()
 {
-	if (pthread_join(handle_, NULL) == 0)
+	if (pthread_join(handle_, NULL) == 0){
+		isStarted_ = false;
 		return true;
+	}
 	return false;
 }
 
