@@ -131,10 +131,31 @@
  *
  * <h2>Threads</h2>
  *
- * The library offers basic mechanisms to create, start and stop a thread.<br>
- * It makes also possible to set scheduling parameters, thread affinity and signal handling.<br>
- * For threads, inherit a class from AbstractThread and specify a run() method.
- * Here we provide a small example. Information about all available methods can be found in the \ref onposix::AbstractThread class.<br>
+ * The library offers basic mechanisms to create, start and stop
+ * threads.<br>
+ * On Linux, it allows also to set scheduling parameters, thread affinity
+ * and signal handling.<br>
+ * <br>
+ * The simplest case to create a thread is to use the \ref onposix::SimpleThread
+ * class:
+ *
+ * \code
+ * void myfunction (void* arg);
+ *
+ * int main ()
+ * {
+ *	int b;
+ * 	SimpleThread t (myfunction, (void*) b);
+ * 	t.start();
+ * 	t.waitForTermination();
+ * }
+ * \endcode
+ *
+ * For more complex cases, or if you need a better exchange of arguments
+ * (e.g., return values), create your own class by inheriting from 
+ * \ref onposix::AbstractThread and specifying a run() method.
+ * Here we provide a small example. Information about all available methods
+ * can be found in the \ref onposix::AbstractThread class.<br>
  *
  * \code
  * class MyThread: public AbstractThread {

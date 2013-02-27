@@ -28,6 +28,7 @@
 #include "StreamSocketServer.hpp"
 #include "AbstractThread.hpp"
 #include "Time.hpp"
+#include "SimpleThread.hpp"
 
 #include "gtest/gtest.h"
 
@@ -650,6 +651,33 @@ TEST (ThreadTest, SchedParam)
 	ASSERT_TRUE(t.stop())
 		<< "ERROR: can't stop the thread!";
 }
+
+int value = 0;
+
+void change_value (void* arg)
+{
+	(*((int*) arg))++;
+}
+
+TEST (ThreadTest, SimpleThread)
+{
+	ASSERT_TRUE(value == 0)
+	    << "ERROR: Initial value of variable is not false";
+	SimpleThread t (change_value, (void*) &value);
+	sleep(2);
+	ASSERT_TRUE(value == 0)
+	    << "ERROR: value of variable modified";
+	t.start();
+	t.waitForTermination();
+	ASSERT_TRUE(value == 1)
+	    << "ERROR: value of variable not incremented";
+	t.start();
+	t.waitForTermination();
+	ASSERT_TRUE(value == 2)
+	    << "ERROR: value of variable not incremented (2nd time)";
+}
+
+
 
 // ======================================================================
 //   SOCKETS
