@@ -90,8 +90,8 @@ class PosixDescriptor {
 		 *
 		 * This is a pointer to the same file descriptor that "owns"
 		 * the instance of AsyncThread.
-		 * The pointer is needed to perform the operation (i.e., read or
-		 * write).
+		 * The pointer is needed to perform the operation
+		 * (i.e., read or write).
 		 */
 		PosixDescriptor* des_;
 
@@ -99,7 +99,8 @@ class PosixDescriptor {
 		size_t size_;
 		
 		/**
-		 * \brief Handler in case of read/write operation on a Buffer
+		 * \brief Handler in case of read/write operation on a
+		 * Buffer
 		 */
 		void (*buff_handler_) (Buffer* b, size_t size);
 
@@ -125,8 +126,8 @@ class PosixDescriptor {
 		/**
 		 * \brief Thread method automatically called by start()
 		 *
-		 * This method is automatically called by start() which, in turn
-		 * is called by startAsyncOperation()
+		 * This method is automatically called by start() which,
+		 * in turn, is called by startAsyncOperation()
 		 */
 		void run();
 
@@ -171,13 +172,6 @@ protected:
 
 public:
 
-	inline bool flush(){
-		if (syncfs(fd_) < 0)
-			return false;
-		else
-			return true;
-	}
-
 	/**
 	 * \brief Run asynchronous read operation
 	 *
@@ -187,8 +181,8 @@ public:
 	 * finished.
 	 * This function will have two parameters: a pointer to the Buffer
 	 * where data has been saved, and the number of bytes actually read.
-	 * @param b Pointer to the Buffer to be provided to the handler function
-	 * as argument
+	 * @param b Pointer to the Buffer to be provided to the handler
+	 * function as argument
 	 * @param size Number of bytes to be read
 	 */
 	inline void async_read(void (*handler)(Buffer* b, size_t size),
@@ -207,7 +201,8 @@ public:
 	 * finished.
 	 * This function will have two parameters: a void* where data
 	 * has been saved, and the number of bytes actually read.
-	 * @param b Pointer to be provided to the handler function as argument
+	 * @param b Pointer to be provided to the handler function as
+	 * argument
 	 * @param size Number of bytes to be read
 	 */
 	inline void async_read(void (*handler)(void* b, size_t size),
@@ -224,10 +219,11 @@ public:
 	 * The operation is internally run on a different thread.
 	 * @param handler Function to be run when the write operation has
 	 * finished.
-	 * This function will have two parameters: a pointer to the Buffer where
-	 * original data was stored, and the number of bytes actually written.
-	 * @param b Pointer to the Buffer to be provided to the handler function
-	 * as argument
+	 * This function will have two parameters: a pointer to the Buffer
+	 * where original data was stored, and the number of bytes actually
+	 * written.
+	 * @param b Pointer to the Buffer to be provided to the handler
+	 * function as argument
 	 * @param size Number of bytes to be written.
 	 */
 	inline void async_write(void (*handler)(Buffer* b, size_t size),
@@ -244,9 +240,10 @@ public:
 	 * The operation is internally run on a different thread.
 	 * @param handler Function to be run when the write operation has
 	 * finished.
-	 * This function will have two parameters: a void* where original data
-	 * were stored, and the number of bytes actually written.
-	 * @param b Pointer to be provided to the handler function as argument
+	 * This function will have two parameters: a void* where original
+	 * data was stored, and the number of bytes actually written.
+	 * @param b Pointer to be provided to the handler function as
+	 * argument
 	 * @param size Number of bytes to be written
 	 */
 	inline void async_write(void (*handler)(void* b, size_t size),
@@ -325,6 +322,17 @@ public:
 	}
 
 #ifdef ONPOSIX_LINUX_SPECIFIC
+
+	/**
+	 * \brief Method to flush this specific descriptor
+	 */
+	inline bool flush(){
+		if (syncfs(fd_) < 0)
+			return false;
+		else
+			return true;
+	}
+
 	/**
 	 * \brief Ioctl on the file descriptor
 	 */
