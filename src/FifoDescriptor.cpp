@@ -45,7 +45,7 @@ namespace onposix {
  * </ul>
  * @exception runtime_error if the ::open() returns an error
  */
-FifoDescriptor::FifoDescriptor(const std::string& name,const  int flags)
+FifoDescriptor::FifoDescriptor(const std::string& name, const int flags)
 {
 		fd_ = open(name.c_str(), flags);
 		if (fd_ <= 0) {

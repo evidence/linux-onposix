@@ -32,8 +32,9 @@ namespace onposix {
 /**
  * \brief Posix pipe.
  *
- * This class wraps two PosixDescriptors because in some circumstances (e.g.,
- * after a fork()) the code wants to explicitly close one of the endpoints.
+ * This class wraps two PosixDescriptors because in some circumstances
+ * (e.g., after a fork()) the code wants to explicitly close one of the
+ * endpoints.
  * The getReadDescriptor() and getWriteDescriptor() methods allow to get
  * the PosixDescriptor and explicitly close it.
  */
@@ -85,7 +86,8 @@ public:
 	/**
 	 * \brief Method to read from the pipe and fill a buffer.
 	 *
-	 * Note: this method may block current thread if data is not available.
+	 * Note: this method may block current thread if data is not
+	 * available.
 	 * The buffer is filled with the read data.
 	 * @param b Pointer to the buffer to be filled
 	 * @param size Number of bytes that must be read
@@ -98,7 +100,8 @@ public:
 	/**
 	 * \brief Method to read from the pipe.
 	 *
-	 * Note: this method may block current thread if data is not available.
+	 * Note: this method may block current thread if data is not
+	 * available.
 	 * The buffer is filled with the read data.
 	 * @param p Pointer to the memory space to be filled
 	 * @param size Number of bytes that must be read
@@ -111,7 +114,8 @@ public:
 	/**
 	 * \brief Method to write data in a buffer to the pipe.
 	 *
-	 * Note: this method may block current thread if data cannot be written.
+	 * Note: this method may block current thread if data cannot
+	 * be written.
 	 * @param b Pointer to the buffer to be filled
 	 * @param size Number of bytes that must be written
 	 * @return -1 in case of error; the number of bytes read otherwise
@@ -123,7 +127,8 @@ public:
 	/**
 	 * \brief Method to write in the pipe.
 	 *
-	 * Note: this method may block current thread if data cannot be written.
+	 * Note: this method may block current thread if data cannot
+	 * be written.
 	 * @param p Pointer to the memory space containing data
 	 * @param size Number of bytes that must be written
 	 * @return -1 in case of error; the number of bytes read otherwise
@@ -135,7 +140,8 @@ public:
 	/**
 	 * \brief Method to write a string in the pipe.
 	 *
-	 * Note: this method may block current thread if data cannot be written.
+	 * Note: this method may block current thread if data cannot
+	 * be written.
 	 * @param string to be written
 	 * @return -1 in case of error; the number of bytes read otherwise
 	 */
@@ -168,11 +174,9 @@ public:
 	 * @return real capacity of the pipe
 	 */
 	inline long int getRealCapacity() const {
-		return fpathconf(read_->getDescriptorNumber(), _PC_PIPE_BUF);
+		return fpathconf(read_->getDescriptorNumber(),
+		    _PC_PIPE_BUF);
 	}
-
-
-
 };
 
 } /* onposix */

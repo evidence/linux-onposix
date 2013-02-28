@@ -37,7 +37,7 @@ namespace onposix {
  *
  * This class is useful for creating threads that do not return any value.
  * For more complex cases (e.g., return value), create your own thread by
- * inheriting AbstractThread.
+ * inheriting from class AbstractThread.
  *
  * Example of usage:
  * \code
@@ -63,7 +63,14 @@ public:
 	    handler_(handler),
 	    arg_(arg) {}
 	virtual ~SimpleThread(){}
-	void run(){
+
+	/**
+	 * \brief Method run on the new thread
+	 *
+	 * This method is run on the new thread once start()
+	 * is invoked.
+	 */
+	inline void run(){
 		handler_(arg_);
 	}
 };

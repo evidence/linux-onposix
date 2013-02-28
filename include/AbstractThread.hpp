@@ -143,6 +143,7 @@ public:
 
 #if defined(ONPOSIX_LINUX_SPECIFIC) && defined(__GLIBC__) && \
     ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ > 3)))
+	// Functions to get/set affinity are available only from glibc 2.4
 	void setAffinity(const std::vector<bool>& s);
 	void getAffinity(std::vector<bool>* v);
 #endif /* ONPOSIX_LINUX_SPECIFIC && GLIBC */
