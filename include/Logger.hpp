@@ -37,11 +37,20 @@
 
 namespace onposix {
 
+/**
+ * \brief Severity level
+ *
+ * This severity level can be specified for both console messages
+ * and file messages. It allows to disable messages (i.e., OFF),
+ * show only error messages (i.e. ERROR), show error and warning
+ * messages (i.e. WARN) or show all messages (i.e. DEBUG).
+ */
 enum severity_level_t {
-	OFF 	= 0,
-	ERROR	= 1,
-	WARN	= 2,
-	DEBUG	= 3};
+	OFF 	= 0, //< No logging messages
+	ERROR	= 1, //< Only errors
+	WARN	= 2, //< Errors and warnings
+	DEBUG	= 3  //< Show all messages
+}; 
 
 /**
  * \brief Macro to configure the logger.
