@@ -104,11 +104,11 @@ void PosixDescriptor::AsyncThread::run()
 	else {
 		DEBUG(ERROR, "Handler called without operation!");
 		throw std::runtime_error ("Async error");
-		return;
 	}
 	des_->lock_.unlock();
 
-	if ((async_operation_ == READ_BUFFER) || (async_operation_ == WRITE_BUFFER))
+	if ((async_operation_ == READ_BUFFER) ||
+	    (async_operation_ == WRITE_BUFFER))
 		buff_handler_(buff_buffer_, n);
 	else
 		void_handler_(void_buffer_, n);
