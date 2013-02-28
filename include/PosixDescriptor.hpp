@@ -37,6 +37,8 @@
 
 #include "Logger.hpp"
 #include "Buffer.hpp"
+#include "AbstractThread.hpp"
+#include "PosixMutex.hpp"
 
 // Uncomment to enable Linux-specific methods:
 #define ONPOSIX_LINUX_SPECIFIC
@@ -45,15 +47,111 @@ namespace onposix {
 
 /**
  * \brief Abstraction of a POSIX descriptor.
+ * 
  * This is an abstract class for the concept of Posix descriptor.
  * The descriptor can correspond to a file (class FileDescriptor)
  * or to a socket (class StreamSocketServerDescriptor).
  */
 class PosixDescriptor {
 
-	PosixDescriptor(int fd): fd_(fd) {}
+	/**
+	 * \brief Mutex to avoid contentions
+	 *
+	 * This mutex allows to avoid contentions on the descriptor
+	 * when asynchronous operations are scheduled.
+	 * In practice, it disable synchronous operations when an
+	 * asynchronous operation has been started (but it has not
+	 * yet finished).
+	 */
+	PosixMutex lock_;
+
+	/**
+	 * \brief Class to run asynchronous operations.
+	 *
+	 * This class is used to run asynchronous operations (i.e.,
+	 * read and write). operations are run on a different thread.
+	 */
+	class AsyncThread: public AbstractThread {
+
+		/**
+		 * \brief Type of scheduled async operation
+		 */
+		enum {
+			NONE		= 0, //< No operation scheduled
+			READ_BUFFER	= 1, //< Read operation on a Buffer
+			READ_VOID	= 2, //< Read operation on a void*
+			WRITE_BUFFER	= 3, //< Write operation on a Buffer
+			WRITE_VOID	= 4  //< Write operation on a void*
+		} async_operation_;
+
+		/**
+		 * \brief File desriptor
+		 *
+		 * This is a pointer to the same file descriptor that "owns"
+		 * the instance of AsyncThread.
+		 * The pointer is needed to perform the operation (i.e., read or
+		 * write).
+		 */
+		PosixDescriptor* des_;
+
+		/// Size of data to be read/written
+		size_t size_;
+		
+		/**
+		 * \brief Handler in case of read/write operation on a Buffer
+		 */
+		void (*buff_handler_) (Buffer* b, size_t size);
+
+		/**
+		 * \brief Buffer in case of read/write operation on a Buffer
+		 */
+		Buffer* buff_buffer_;
+		
+		/**
+		 * \brief Handler in case of read/write operation on a void*
+		 */
+		void (*void_handler_) (void* b, size_t size);
+
+		/**
+		 * \brief void* pointer in case of read/write operation on a void*
+		 */
+		void* void_buffer_;
+	
+		// Disable default constructor
+		AsyncThread();
+
+		/**
+		 * \brief Thread method automatically called by start()
+		 *
+		 * This method is automatically called by start() which, in turn
+		 * is called by startAsyncOperation()
+		 */
+		void run();
+
+	public:
+
+		/**
+		 * \brief Constructor. 
+		 *
+		 * It just initializes variables.
+		 * @param des Pointer to the PosixDescriptor that "owns"
+		 * this instance of AsyncThread
+		 */
+		explicit AsyncThread(PosixDescriptor* des):
+		    async_operation_ (NONE), des_(des) {}
+
+		void startAsyncOperation (bool read_operation, 
+		    void (*handler) (Buffer* b, size_t size),
+		    	Buffer* buff, size_t size);
+		void startAsyncOperation (bool read_operation,
+		    void (*handler) (void* b, size_t size),
+		    	void* buff, size_t size);
+	} asyncThread_;
+		
+	PosixDescriptor(int fd): asyncThread_(this), fd_(fd) {}
 
 	friend class Pipe;
+	friend class AsyncThread;
 
 protected:
 	/**
@@ -65,14 +163,84 @@ protected:
 	int __read (void* p, size_t size);
 	int __write (const void* p, size_t size);
 
-	PosixDescriptor(): fd_(-1) {}
-
+	PosixDescriptor(): asyncThread_(this), fd_(-1) {}
 
 public:
 
+	/**
+	 * \brief Run asynchronous read operation
+	 *
+	 * This method schedules an asynchronous read operation.
+	 * The operation is internally run on a different thread.
+	 * @param handler Function to be run when the read operation has finished.
+	 * This function will have two parameters: a pointer to the Buffer where data
+	 * has been saved, and the number of bytes actually read.
+	 * @param b Pointer to the Buffer to be provided to the handler function as argument
+	 * @param size Number of bytes to be read
+	 */
+	inline void async_read(void (*handler)(Buffer* b, size_t size),
+	    Buffer* b,
+	    size_t size){
+		lock_.lock();
+		asyncThread_.startAsyncOperation(true, handler, b, size);
+	}
+
+	/**
+	 * \brief Run asynchronous read operation
+	 *
+	 * This method schedules an asynchronous read operation.
+	 * The operation is internally run on a different thread.
+	 * @param handler Function to be run when the read operation has finished.
+	 * This function will have two parameters: a void* where data
+	 * has been saved, and the number of bytes actually read.
+	 * @param b Pointer to be provided to the handler function as argument
+	 * @param size Number of bytes to be read
+	 */
+	inline void async_read(void (*handler)(void* b, size_t size),
+	    void* b,
+	    size_t size){
+		lock_.lock();
+		asyncThread_.startAsyncOperation(true, handler, b, size);
+	}
+	
+	/**
+	 * \brief Run asynchronous write operation
+	 *
+	 * This method schedules an asynchronous write operation.
+	 * The operation is internally run on a different thread.
+	 * @param handler Function to be run when the write operation has finished.
+	 * This function will have two parameters: a pointer to the Buffer where original data
+	 * were stored, and the number of bytes actually written.
+	 * @param b Pointer to the Buffer to be provided to the handler function as argument
+	 * @param size Number of bytes to be written.
+	 */
+	inline void async_write(void (*handler)(Buffer* b, size_t size),
+	    Buffer* b,
+	    size_t size){
+		lock_.lock();
+		asyncThread_.startAsyncOperation(false, handler, b, size);
+	}
+
+	/**
+	 * \brief Run asynchronous write operation
+	 *
+	 * This method schedules an asynchronous write operation.
+	 * The operation is internally run on a different thread.
+	 * @param handler Function to be run when the write operation has finished.
+	 * This function will have two parameters: a void* where original data
+	 * were stored, and the number of bytes actually written.
+	 * @param b Pointer to be provided to the handler function as argument
+	 * @param size Number of bytes to be written
+	 */
+	inline void async_write(void (*handler)(void* b, size_t size),
+	    void* b,
+	    size_t size){
+		lock_.lock();
+		asyncThread_.startAsyncOperation(false, handler, b, size);
+	}
+		
 	int read (Buffer* b, size_t size);
 	int read (void* p, size_t size);
-
 	int write (Buffer* b, size_t size);
 	int write (const void* p, size_t size);
 	int write (const std::string& s);
@@ -112,7 +280,7 @@ public:
 	 * \endcode
 	 * @exception runtime_error if the ::dup() returns an error
 	 */
-	PosixDescriptor(const PosixDescriptor& src){
+	PosixDescriptor(const PosixDescriptor& src): asyncThread_(this){
 		fd_ = ::dup(src.fd_);
 		if (fd_ < 0) {
 			DEBUG(ERROR, "Bad file descriptor");
@@ -155,6 +323,7 @@ public:
 	}
 #endif /* ONPOSIX_LINUX_SPECIFIC */
 };
+
 
 } /* onposix */
 

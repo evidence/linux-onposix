@@ -504,6 +504,51 @@ TEST (FifoDescriptorTest, MainTest)
 	std::cout << "\t\tFifo size: " << fd.getCapacity() << std::endl;
 }
 
+bool read_handler_called = false;
+
+void read_handler(Buffer* b, size_t size)
+{
+	read_handler_called = true;
+	ASSERT_TRUE (size == 15)
+	    << "ERROR: read the wrong number of bytes!";
+	ASSERT_TRUE(b->compare("ABC", 3))
+	   << "ERROR: content of buffer wrong";
+}
+
+void reader_fifo(void*)
+{
+	// Reader
+	Buffer b2(20);
+	ASSERT_TRUE(read_handler_called == false)
+	   << "ERROR: initial value of read_handler_called";
+	FifoDescriptor fd2("/tmp/test-async-1", O_RDONLY);
+	fd2.async_read(read_handler, &b2, 20);
+	ASSERT_TRUE(read_handler_called == false)
+	   << "ERROR: value of read_handler_called modified";
+	sleep(5);
+}
+
+
+TEST (FifoDescriptorTest, AsyncRead)
+{
+	// Writer:
+	unlink("/tmp/test-async-1");
+	FifoDescriptor fd1("/tmp/test-async-1", O_RDWR|O_CREAT, S_IRWXU);
+	const char* s1 = "ABCDEFGHILMNOPQ";
+	Buffer b1 (15);
+	b1.fill (s1, 15);
+
+	SimpleThread t (reader_fifo, 0);
+	t.start();
+
+	// Again writer
+	fd1.write(&b1, 15);
+	sleep(10);
+	
+	// Again reader
+	ASSERT_TRUE(read_handler_called == true)
+	   << "ERROR: handler not called";
+}
 
 // ======================================================================
 //   FILEs
@@ -723,7 +768,7 @@ class SocketReader: public AbstractDescriptorReader {
 		    s_->getDescriptorNumber())
 			<< "ERROR: dataAvailable called with wrong descriptor!";
 
-		ASSERT_TRUE(!strncmp(buff.getBuffer(), "XYZ", 3))
+		ASSERT_TRUE(buff.compare("XYZ", 3))
 			<< "ERROR in Socket";
 	}
  };
@@ -738,7 +783,7 @@ TEST (ThreadSockTest, MainTest) {
 	StreamSocketServerDescriptor des (serv);
 	Buffer b (10);
 	des.read(&b, b.getSize());
-	ASSERT_TRUE(!strncmp(b.getBuffer(), "ABCDEFGHIL", 10))
+	ASSERT_TRUE(b.compare("ABCDEFGHIL", 10))
 		<< "Error in Socket (2)";
 	DescriptorsMonitor dm;
 	SocketReader sr(dm, &des);
