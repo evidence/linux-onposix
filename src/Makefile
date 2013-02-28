@@ -1,5 +1,5 @@
 INCLUDE_DIR = ../include
-OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  StreamSocketServerDescriptor.o DgramSocketServerDescriptor.o StreamSocketServer.o StreamSocketClientDescriptor.o DgramSocketClientDescriptor.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o Pipe.o
+OBJECTS = Buffer.o DescriptorsMonitor.o FileDescriptor.o FifoDescriptor.o Logger.o  PosixDescriptor.o  StreamSocketServerDescriptor.o DgramSocketServerDescriptor.o StreamSocketServer.o StreamSocketClientDescriptor.o DgramSocketClientDescriptor.o AbstractThread.o PosixMutex.o PosixCondition.o Time.o Pipe.o Process.o
 INCLUDES = $(INCLUDE_DIR)/*.hpp
 CXXFLAGS += -I$(INCLUDE_DIR) 
 
@@ -43,6 +43,8 @@ DgramSocketClientDescriptor.o: $(INCLUDES)
 Time.o: $(INCLUDES)
 
 Pipe.o: $(INCLUDES)
+
+Process.o: $(INCLUDES)
 
 .PHONY: clean
 

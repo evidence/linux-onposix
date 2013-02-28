@@ -18,6 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include "gtest/gtest.h"
+
+#include <cstdio>
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <string>
+
+
 #include "Buffer.hpp"
 #include "AbstractDescriptorReader.hpp"
 #include "DescriptorsMonitor.hpp"
@@ -26,15 +35,13 @@
 #include "Logger.hpp"
 #include "StreamSocketServerDescriptor.hpp"
 #include "StreamSocketServer.hpp"
+#include "StreamSocketClientDescriptor.hpp"
 #include "AbstractThread.hpp"
 #include "Time.hpp"
 #include "SimpleThread.hpp"
+#include "Process.hpp"
+#include "Pipe.hpp"
 
-#include "gtest/gtest.h"
-
-#include <cstdio>
-#include <cassert>
-#include <iostream>
 
 // Uncomment to enable Linux-specific methods:
 // #define ONPOSIX_LINUX_SPECIFIC
@@ -504,11 +511,11 @@ TEST (FifoDescriptorTest, MainTest)
 	std::cout << "\t\tFifo size: " << fd.getCapacity() << std::endl;
 }
 
-bool read_handler_called = false;
+bool read_fifo_handler_called = false;
 
-void read_handler(Buffer* b, size_t size)
+void read_fifo_handler(Buffer* b, size_t size)
 {
-	read_handler_called = true;
+	read_fifo_handler_called = true;
 	ASSERT_TRUE (size == 15)
 	    << "ERROR: read the wrong number of bytes!";
 	ASSERT_TRUE(b->compare("ABC", 3))
@@ -519,12 +526,12 @@ void reader_fifo(void*)
 {
 	// Reader
 	Buffer b2(20);
-	ASSERT_TRUE(read_handler_called == false)
-	   << "ERROR: initial value of read_handler_called";
+	ASSERT_TRUE(read_fifo_handler_called == false)
+	   << "ERROR: initial value of read_fifo_handler_called";
 	FifoDescriptor fd2("/tmp/test-async-1", O_RDONLY);
-	fd2.async_read(read_handler, &b2, 20);
-	ASSERT_TRUE(read_handler_called == false)
-	   << "ERROR: value of read_handler_called modified";
+	fd2.async_read(read_fifo_handler, &b2, 20);
+	ASSERT_TRUE(read_fifo_handler_called == false)
+	   << "ERROR: value of read_fifo_handler_called modified";
 	sleep(5);
 }
 
@@ -546,7 +553,7 @@ TEST (FifoDescriptorTest, AsyncRead)
 	sleep(10);
 	
 	// Again reader
-	ASSERT_TRUE(read_handler_called == true)
+	ASSERT_TRUE(read_fifo_handler_called == true)
 	   << "ERROR: handler not called";
 }
 
@@ -622,6 +629,58 @@ TEST (FileDescriptorTest, ReadOnly)
 		<< "ERROR: exception thrown when reading a file";
 }
 
+
+
+// ======================================================================
+//   PROCESSES
+// ======================================================================
+
+Process * proc1 = 0;
+bool process_bool1 = false;
+
+void process1 ()
+{
+	ASSERT_TRUE(proc1->getPid() == getpid())
+		<< "ERROR: pid for child wrong";
+	process_bool1 = true;
+}
+
+TEST (ProcessTest, exec)
+{
+	std::vector<std::string> args;
+	args.push_back("-l");
+	args.push_back("*.cpp");
+	Process proc0("ls", args);
+
+	proc1 = new Process(process1);
+	sleep(3);
+	ASSERT_TRUE(proc1->getPid() != getpid())
+		<< "ERROR: pid for parent wrong";
+	ASSERT_TRUE(process_bool1 == false)
+		<< "ERROR: process_bool1 changed value";
+	proc1->sendSignal(SIGKILL);
+}
+
+Pipe process_pipe;
+
+void process2()
+{
+	Buffer b(10);
+	b.fill("XYZWA", 5);
+	process_pipe.write(&b, 5);
+
+}
+
+TEST (ProcessTest, processPipe)
+{
+	Process p (process2);
+	sleep(5);
+	Buffer b(10);
+	process_pipe.read(&b, 5);
+	ASSERT_TRUE(b.compare("XYZWA", 5))
+		<< "ERROR: Different values in buffer!";
+	p.sendSignal(SIGKILL);
+}
 
 // ======================================================================
 //   THREADS
@@ -774,7 +833,8 @@ class SocketReader: public AbstractDescriptorReader {
  };
 
 
-TEST (ThreadSockTest, MainTest) {
+TEST (ThreadSockTest, MainTest)
+{
 	unlink("/tmp/test-socket");
 	StreamSocketServer serv("/tmp/test-socket");
 	MyThreadSock t;
@@ -789,6 +849,65 @@ TEST (ThreadSockTest, MainTest) {
 	SocketReader sr(dm, &des);
 	dm.wait();
 }
+
+
+bool read_socket_handler_called = false;
+
+void read_socket_handler(Buffer* b, size_t size)
+{
+	read_socket_handler_called = true;
+	ASSERT_TRUE (size == 15)
+	    << "ERROR: read the wrong number of bytes!";
+	ASSERT_TRUE(b->compare("ABC", 3))
+	   << "ERROR: content of buffer wrong";
+}
+
+void async_socket_reader(void*)
+{
+	StreamSocketClientDescriptor sk2("/tmp/test-async-socket");
+
+	// Reader
+	Buffer b2(20);
+	ASSERT_TRUE(read_socket_handler_called == false)
+	   << "ERROR: initial value of read_socket_handler_called";
+	sk2.async_read(read_socket_handler, &b2, 15);
+	ASSERT_TRUE(read_socket_handler_called == false)
+	   << "ERROR: value of read_socket_handler_called modified";
+	sleep(10);
+}
+
+
+TEST (ThreadSockAsyncTest, AsyncRead)
+{
+	// Writer:
+	unlink("/tmp/test-async-socket");
+	StreamSocketServer des("/tmp/test-async-socket");
+
+	SimpleThread t (async_socket_reader, 0);
+	t.start();
+
+	sleep(2);
+
+	StreamSocketServerDescriptor sk1(des);
+	const char* s1 = "ABCDEFGHILMNOPQ";
+	Buffer b1 (15);
+	b1.fill (s1, 15);
+
+	sleep(4);
+
+	// Again writer
+	sk1.write(&b1, 15);
+	sk1.flush();
+	sleep(10);
+	
+	// Again reader
+	ASSERT_TRUE(read_socket_handler_called == true)
+	   << "ERROR: handler not called";
+
+	t.waitForTermination();
+}
+
+
 
 // ======================================================================
 //   TIME 

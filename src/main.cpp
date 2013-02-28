@@ -129,6 +129,38 @@
  *
  * Some examples about the characteristics offered by the library:
  *
+ * <h2>Processes</h2>
+ *
+ * The library provides the class \ref onposix::Process to run a function
+ * or a program through fork() and fork()+execvp(), respectively.
+ *
+ * Example of usage to run a function:
+ * \code
+ *
+ * void function ()
+ * {
+ *	//...
+ * }
+ *
+ * int main ()
+ * {
+ * 	Process p(function);
+ * }
+ * \endcode
+ *
+ * Example of usage to run a program --- i.e., through for()+execvp()
+ * \code
+ *
+ * int main ()
+ * {
+ *	std::vector<std::string> args;
+ *	args.push_back("-l");
+ *	args.push_back("*.cpp");
+ *
+ * 	Process p("ls", args);
+ * }
+ * \endcode
+ *
  * <h2>Threads</h2>
  *
  * The library offers basic mechanisms to create, start and stop
@@ -136,8 +168,8 @@
  * On Linux, it allows also to set scheduling parameters, thread affinity
  * and signal handling.<br>
  * <br>
- * The simplest case to create a thread is to use the \ref onposix::SimpleThread
- * class:
+ * The simplest case to create a thread is to use the 
+ * \ref onposix::SimpleThread class:
  *
  * \code
  * void myfunction (void* arg);
