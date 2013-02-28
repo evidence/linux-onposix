@@ -140,7 +140,9 @@ class PosixDescriptor {
 		 * this instance of AsyncThread
 		 */
 		explicit AsyncThread(PosixDescriptor* des):
-		    async_operation_ (NONE), des_(des) {}
+		    async_operation_ (NONE), des_(des), size_(0),
+		    buff_handler_(0), buff_buffer_(0),
+		    void_handler_(0), void_buffer_(0){}
 
 		void startAsyncOperation (bool read_operation, 
 		    void (*handler) (Buffer* b, size_t size),
