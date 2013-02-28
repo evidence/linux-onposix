@@ -115,7 +115,7 @@ protected:
 	 * This function can be used in the subclasses to check if a request
 	 * for termination has been made; if so, the thread is terminated.
 	 */
-	static void checkForTermination() {
+	static void checkTermination() {
 		pthread_testcancel();
 	}
 
