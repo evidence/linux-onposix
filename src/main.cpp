@@ -207,22 +207,52 @@
  * fd.close();
  * \endcode
  *
+ * It is also possible to use asynchronous read/write operations:
+ *
+ *
+ * \code
+ * void read_handler(Buffer* b, size_t size)
+ * {
+ *	//...
+ * }
+ *
+ * FileDescriptor fd ("/tmp/myfile", O_RDONLY);
+ * Buffer b (10);
+ * fd.async_read (read_handler, &b, b.getSize());
+ * fd.close();
+ * \endcode
+ *
  * <h2>Socket descriptors</h2>
  *
- * The library offers mechanisms for both connection-oriented (e.g., TCP) and connection-less (e.g., UDP) communications.
+ * The library offers mechanisms for both connection-oriented (e.g., TCP) and
+ * connection-less (e.g., UDP) communications.
  * Communications can be either AF_UNIX or AF_INET.
  * Here is a small example about a TCP client-server application.
- * More information can be found in the description of classes \ref onposix::StreamSocketServer, \ref onposix::StreamSocketServerDescriptor,
- * \ref onposix::StreamSocketClientDescriptor, \ref onposix::DgramSocketClientDescriptor and \ref onposix::DgramSocketServerDescriptor.<br>
+ * More information can be found in the description of classes
+ * \ref onposix::StreamSocketServer, \ref onposix::StreamSocketServerDescriptor,
+ * \ref onposix::StreamSocketClientDescriptor,
+ * \ref onposix::DgramSocketClientDescriptor and
+ * \ref onposix::DgramSocketServerDescriptor.<br>
  *
  * Server-side:
  * \code
+ * void read_handler(Buffer* b, size_t size)
+ * {
+ *	//...
+ * }
+ *
  * int port = 1234;
  * StreamSocketServer serv (port);
  * while (true) {
  *	StreamSocketServerDescriptor des (serv);
  *	Buffer b (10);
+ *
+ *	// Synchronous read:
  *	des.read(&b, b.getSize());
+ *	
+ *	//...or asynchronous read:
+ *	fd.async_read (read_handler, &b, b.getSize());
+ *
  *	// ...
  * }
  * \endcode
