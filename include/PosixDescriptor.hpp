@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -113,7 +114,8 @@ class PosixDescriptor {
 		void (*void_handler_) (void* b, size_t size);
 
 		/**
-		 * \brief void* pointer in case of read/write operation on a void*
+		 * \brief void* pointer in case of read/write operation on a
+		 * void*
 		 */
 		void* void_buffer_;
 	
@@ -167,15 +169,24 @@ protected:
 
 public:
 
+	inline bool flush(){
+		if (syncfs(fd_) < 0)
+			return false;
+		else
+			return true;
+	}
+
 	/**
 	 * \brief Run asynchronous read operation
 	 *
 	 * This method schedules an asynchronous read operation.
 	 * The operation is internally run on a different thread.
-	 * @param handler Function to be run when the read operation has finished.
-	 * This function will have two parameters: a pointer to the Buffer where data
-	 * has been saved, and the number of bytes actually read.
-	 * @param b Pointer to the Buffer to be provided to the handler function as argument
+	 * @param handler Function to be run when the read operation has
+	 * finished.
+	 * This function will have two parameters: a pointer to the Buffer
+	 * where data has been saved, and the number of bytes actually read.
+	 * @param b Pointer to the Buffer to be provided to the handler function
+	 * as argument
 	 * @param size Number of bytes to be read
 	 */
 	inline void async_read(void (*handler)(Buffer* b, size_t size),
@@ -190,7 +201,8 @@ public:
 	 *
 	 * This method schedules an asynchronous read operation.
 	 * The operation is internally run on a different thread.
-	 * @param handler Function to be run when the read operation has finished.
+	 * @param handler Function to be run when the read operation has
+	 * finished.
 	 * This function will have two parameters: a void* where data
 	 * has been saved, and the number of bytes actually read.
 	 * @param b Pointer to be provided to the handler function as argument
@@ -208,10 +220,12 @@ public:
 	 *
 	 * This method schedules an asynchronous write operation.
 	 * The operation is internally run on a different thread.
-	 * @param handler Function to be run when the write operation has finished.
-	 * This function will have two parameters: a pointer to the Buffer where original data
-	 * were stored, and the number of bytes actually written.
-	 * @param b Pointer to the Buffer to be provided to the handler function as argument
+	 * @param handler Function to be run when the write operation has
+	 * finished.
+	 * This function will have two parameters: a pointer to the Buffer where
+	 * original data was stored, and the number of bytes actually written.
+	 * @param b Pointer to the Buffer to be provided to the handler function
+	 * as argument
 	 * @param size Number of bytes to be written.
 	 */
 	inline void async_write(void (*handler)(Buffer* b, size_t size),
@@ -226,7 +240,8 @@ public:
 	 *
 	 * This method schedules an asynchronous write operation.
 	 * The operation is internally run on a different thread.
-	 * @param handler Function to be run when the write operation has finished.
+	 * @param handler Function to be run when the write operation has
+	 * finished.
 	 * This function will have two parameters: a void* where original data
 	 * were stored, and the number of bytes actually written.
 	 * @param b Pointer to be provided to the handler function as argument
