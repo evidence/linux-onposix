@@ -19,6 +19,7 @@
  */
 
 #include <stdexcept>
+#include <unistd.h>
 #include "StreamSocketServer.hpp"
 #include "Logger.hpp"
 
