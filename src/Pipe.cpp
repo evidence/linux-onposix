@@ -22,7 +22,7 @@ Pipe::Pipe(): read_(0), write_(0)
 {
 	int fd[2];
 	if (pipe(fd) != 0) {
-		DEBUG(ERROR, "Error opening pipe");
+		ERROR("Opening pipe");
 		throw std::runtime_error ("Open pipe error");
 	}
 	read_ = new PosixDescriptor(fd[0]);

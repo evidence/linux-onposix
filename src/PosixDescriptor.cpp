@@ -102,7 +102,7 @@ void PosixDescriptor::AsyncThread::run()
 	else if (async_operation_ == WRITE_VOID)
 		n = des_->__write(void_buffer_, size_);
 	else {
-		DEBUG(ERROR, "Handler called without operation!");
+		ERROR("Handler called without operation!");
 		throw std::runtime_error ("Async error");
 	}
 	des_->lock_.unlock();
@@ -159,7 +159,7 @@ int PosixDescriptor::__read (void* buffer, size_t size)
 int PosixDescriptor::read (Buffer* b, size_t size)
 {
 	if (b->getSize() == 0 || size > b->getSize()) {
-		DEBUG(ERROR, "Buffer size not enough!");
+		ERROR("Buffer size not enough!");
 		return -1;
 	}
 	lock_.lock();
@@ -230,7 +230,7 @@ int PosixDescriptor::__write (const void* buffer, size_t size)
 int PosixDescriptor::write (Buffer* b, size_t size)
 {
 	if (b->getSize() == 0 || size > b->getSize()) {
-		DEBUG(ERROR, "Buffer size not enough!");
+		ERROR("Buffer size not enough!");
 		return -1;
 	}
 	return __write(reinterpret_cast<const void*> (b->getBuffer()),

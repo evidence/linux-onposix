@@ -322,13 +322,21 @@
  *
  * The whole library is built on top of a Logger.
  * Log messages can be printed to console and/or to a file with different
- * severity levels.
- * 
+ * log levels. 
+ * In file Logger.hpp the following log levels can be set for both LOG_LEVEL_CONSOLE and LOG_LEVEL_FILE :
+ * <ul>
+ * <li> LOG_NOLOG: No logging
+ * <li> LOG_ERRORS: Only log errors
+ * <li> LOG_WARNINGS: Log warnings and errors
+ * <li> LOG_ALL: Log all messages (debug messages included)
+ * </ul>
+ *
+ * To log a message, use
  * \code
- * DEBUG_CONF("outputfile", DEBUG, ERROR);
- * DEBUG(DEBUG, "hello " << "world");
- * DEBUG(WARN, "something " << "strange");
- * DEBUG(ERR, "this is an error");
+ * LOG_FILE("/tmp/myproject");
+ * DEBUG("hello " << "world");
+ * DEBUG("something " << "strange");
+ * DEBUG("this is an error");
  * \endcode
  *
  * <h2>Timing</h2>

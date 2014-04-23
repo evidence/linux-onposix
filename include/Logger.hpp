@@ -28,122 +28,240 @@
 #include <sys/time.h>
 
 /// Comment this line if you don't need multithread support
-#define LOGGER_MULTITHREAD
+#define LOG_MULTITHREAD
 
-#ifdef LOGGER_MULTITHREAD
+/// Log levels:
+#define LOG_NOLOG	0 ///< No logging
+#define LOG_ERRORS	1 ///< Log only error messages
+#define LOG_WARNINGS	2 ///< Log warnings and error messages
+#define LOG_ALL		3 ///< Log all
+
+/// Log level for console messages:
+#ifndef LOG_LEVEL_CONSOLE
+#define LOG_LEVEL_CONSOLE	LOG_ERROR
+#endif
+
+/// Log level for file:
+#ifndef LOG_LEVEL_FILE
+#define LOG_LEVEL_FILE		LOG_ALL
+#endif
+
+
+
+#ifdef LOG_MULTITHREAD
 #include "PosixMutex.hpp"
+#endif
+
+/**
+ * @brief Macro to set the file used for logging.
+ *
+ * @param Base name of the file used for logging (e.g. "/tmp/myproject")
+ *
+ * Example of configuration of the Logger: *
+ * \code
+ * 	LOG_FILE("/tmp/myproject);
+ * \endcode
+ */
+#define LOG_FILE(outputFile) { \
+	onposix::Logger::getInstance().setFile(outputFile); \
+	}
+
+
+
+/**
+ * @brief Macro to print error messages.
+ *
+ * Example of usage:
+ * \code
+ * 	ERROR("hello " << "world");
+ * \endcode
+ */
+#if (defined NDEBUG) || (LOG_LEVEL_CONSOLE < LOG_ERRORS && LOG_LEVEL_FILE < LOG_ERRORS)
+	#define ERROR(...)
+#elif (LOG_LEVEL_CONSOLE < LOG_ERRORS)
+	#define ERROR(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[ERROR]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#elif (LOG_LEVEL_FILE < LOG_ERRORS)
+	#define ERROR(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[ERROR]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#else
+	#define ERROR(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[ERROR]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#endif
+	
+
+/**
+ * @brief Macro to print warning messages.
+ *
+ * Example of usage:
+ * \code
+ * 	WARNING("hello " << "world");
+ * \endcode
+ */
+#if (defined NDEBUG) || (LOG_LEVEL_CONSOLE < LOG_WARNINGS && LOG_LEVEL_FILE < LOG_WARNINGS)
+	#define WARNING(...)
+#elif (LOG_LEVEL_CONSOLE < LOG_WARNINGS)
+	#define WARNING(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[WARNING]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#elif (LOG_LEVEL_FILE < LOG_WARNINGS)
+	#define WARNING(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[WARNING]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#else
+	#define WARNING(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[WARNING]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#endif
+
+
+
+/**
+ * @brief Macro to print debug messages.
+ *
+ * Example of usage:
+ * \code
+ * 	DEBUG("hello " << "world");
+ * \endcode
+ */
+#if (defined NDEBUG) || (LOG_LEVEL_CONSOLE < LOG_ALL && LOG_LEVEL_FILE < LOG_ALL)
+	#define DEBUG(...)
+#elif (LOG_LEVEL_CONSOLE < LOG_ALL)
+	#define DEBUG(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[DEBUG]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#elif (LOG_LEVEL_FILE < LOG_ALL)
+	#define DEBUG(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[DEBUG]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
+#else
+	#define DEBUG(msg) { \
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << "[DEBUG]\t"; \
+		__debug_stream__ << msg; \
+		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
 #endif
 
 
 namespace onposix {
 
 /**
- * \brief Severity level
- *
- * This severity level can be specified for both console messages
- * and file messages. It allows to disable messages (i.e., OFF),
- * show only error messages (i.e. ERROR), show error and warning
- * messages (i.e. WARN) or show all messages (i.e. DEBUG).
- */
-enum severity_level_t {
-	OFF 	= 0, //< No logging messages
-	ERROR	= 1, //< Only errors
-	WARN	= 2, //< Errors and warnings
-	DEBUG	= 3  //< Show all messages
-}; 
-
-/**
- * \brief Macro to configure the logger.
- *
- * @param Base name of the file used for logging (e.g. "/tmp/myproject")
- * @param File severity level (i.e., OFF, ERROR, WARN, DEBUG)
- * @param Console severity level (i.e., OFF, ERROR, WARN, DEBUG)
- *
- * Example of configuration of the Logger: *
- * \code
- * 	DEBUG_CONF("outputfile", DEBUG, ERROR);
- * \endcode
- */
-#define DEBUG_CONF(outputFile, \
-		fileSeverityLevel, \
-		screenSeverityLevel) { \
-			Logger::getInstance().configure(outputFile, \
-						fileSeverityLevel, \
-						screenSeverityLevel); \
-		}
-
-/**
- * \brief Macro to print log messages.
- *
- * Example of usage of the Logger:
- * \code
- * 	DEBUG(DEBUG, "hello " << "world");
- * \endcode
- */
-#define DEBUG(priority, msg) { \
-	std::ostringstream __debug_stream__; \
-	__debug_stream__ << msg; \
-	Logger::getInstance().print(priority, __FILE__, __LINE__, \
-			__debug_stream__.str()); \
-	}
-
-
-
-
-
-/**
- * \brief Simple logger to log messages on file and console.
+ * @brief Simple logger to log messages on file and console.
  *
  * This is the implementation of a simple logger in C++. It is implemented 
- * as a Singleton, so it can be easily called through two DEBUG macros.
+ * as a Singleton, so it can be easily called through the DEBUG, WARNING
+ * and ERROR macros.
  * It is Pthread-safe.
- * It allows to log on both file and screen, and to specify a severity level
- * for both.
+ * It allows to log on both file and console.
  *
  * Example of configuration of the Logger: *
  * \code
- * 	DEBUG_CONF("outputfile", DEBUG, ERROR);
+ * 	LOG_FILE("/tmp/myproject);
  * \endcode
  *
  * Example of usage of the Logger:
  * \code
- * 	DEBUG(DEBUG, "hello " << "world");
+ * 	DEBUG("hello " << "world");
  * \endcode
  */
 class Logger
 {
-	/* \brief Current severity level for logging on file.
-	 *
-	 * It can be OFF, DEBUG, WARN or ERROR.
-	 */
-	severity_level_t fileSeverityLevel_;
+public:
+	static Logger& getInstance();
 
-	/* \brief Current severity level for logging on screen.
-	 *
-	 * It can be OFF, DEBUG, WARN or ERROR.
-	 */
-	severity_level_t screenSeverityLevel_;
+	void printOnFile(	const std::string&	sourceFile,
+				const int 		codeLine,
+				const std::string& 	message);
+	void printOnConsole(	const std::string&	sourceFile,
+				const int 		codeLine,
+				const std::string& 	message);
 
-#ifdef LOGGER_MULTITHREAD
+	void setFile (const std::string&	outputFile);
+
+	/**
+	 * \brief Method to know if the latest message has been printed on file
+	 * @return true if it has been printed; false otherwise
+	 */
+	inline bool latestMsgPrintedOnFile() const {
+		return latestMsgPrintedOnFile_;
+	}
+
+	/**
+	 * \brief Method to know if the latest message has been printed on file
+	 * @return true if it has been printed; false otherwise
+	 */
+	inline bool latestMsgPrintedOnConsole() const {
+		return latestMsgPrintedOnConsole_;
+	}
+
+private:
+	Logger();
+	~Logger();
+
+#ifdef LOG_MULTITHREAD
 	/**
 	 * \brief Lock for mutual exclusion between different threads
 	 */
 	static PosixMutex lock_;
 #endif
-	
+
 	/**
-	 * \brief Pointer to the unique Logger (i.e., Singleton)
+	 * @brief Pointer to the unique Logger (i.e., Singleton)
 	 */
 	static Logger* m_;
 
 	/**
-	 * \brief Initial part of the name of the file used for Logging.
+	 * @brief Initial part of the name of the file used for Logging.
+	 *
 	 * Date and time are automatically appended.
 	 */
 	std::string logFile_;
 
 	/**
-	 * \brief Stream used when logging on a file
+	 * @brief Stream used when logging on a file
 	 */
 	std::ofstream out_;
 
@@ -160,52 +278,19 @@ class Logger
 
 	/**
 	 * \brief Debug: to know if the latest message has been printed 
-	 * on screen.
+	 * on console.
 	 */
-	bool latestMsgPrintedOnScreen_;
-
-	Logger();
-	~Logger();
+	bool latestMsgPrintedOnConsole_;
 
 	/**
-	 * \brief Method to lock in case of multithreading
+	 * @brief Method to lock in case of multithreading
 	 */
 	inline static void lock();
 
 	/**
-	 * \brief Method to unlock in case of multithreading
+	 * @brief Method to unlock in case of multithreading
 	 */
 	inline static void unlock();
-
-public:
-
-	static Logger& getInstance();
-
-	void print(const severity_level_t	severityLevel,
-			const std::string&	sourceFile,
-			const int 		codeLine,
-			const std::string& 	message);
-
-	void configure (const std::string&	outputFile,
-			const severity_level_t	fileSeverityLevel,
-			const severity_level_t	screenSeverityLevel);
-
-	/**
-	 * \brief Method to know if the latest message has been printed on file
-	 * @return true if it has been printed; false otherwise
-	 */
-	inline bool latestMsgPrintedOnFile() const {
-		return latestMsgPrintedOnFile_;
-	}
-
-	/**
-	 * \brief Method to know if the latest message has been printed on file
-	 * @return true if it has been printed; false otherwise
-	 */
-	inline bool latestMsgPrintedOnScreen() const {
-		return latestMsgPrintedOnScreen_;
-	}
-
 };
 
 } /* onposix */

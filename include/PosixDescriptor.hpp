@@ -297,7 +297,7 @@ public:
 	PosixDescriptor(const PosixDescriptor& src): asyncThread_(this){
 		fd_ = ::dup(src.fd_);
 		if (fd_ < 0) {
-			DEBUG(ERROR, "Bad file descriptor");
+			ERROR("Bad file descriptor");
 			throw std::runtime_error("PosixDescriptor: error in copy constructor");
 		}
 	}
@@ -315,7 +315,7 @@ public:
 	 */
 	PosixDescriptor& operator= (const PosixDescriptor& src){
 		if (::dup2(src.fd_, fd_) < 0) {
-			DEBUG(ERROR, "Bad file descriptor");
+			ERROR("Bad file descriptor");
 			throw std::runtime_error("PosixDescriptor: error in operator=");
 		}
 		return *this;

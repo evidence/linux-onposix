@@ -29,7 +29,7 @@ namespace onposix {
 // Definition (and initialization) of static attributes
 Logger* Logger::m_ = 0;
 
-#ifdef LOGGER_MULTITHREAD
+#ifdef LOG_MULTITHREAD
 
 PosixMutex Logger::lock_ ;
 
@@ -60,37 +60,30 @@ inline void Logger::unlock(){}
  * configure() method.
  */
 Logger::Logger():
-		fileSeverityLevel_(OFF),
-		screenSeverityLevel_(ERROR),
+		logFile_(""),
 		latestMsgPrintedOnFile_(false),
-		latestMsgPrintedOnScreen_(false)
+		latestMsgPrintedOnConsole_(false)
 {
 	gettimeofday(&initialTime_, NULL);
 }
 
 /**
- * \brief Method to configure the logger. Called by the DEBUG_CONF() macro.
- * To make implementation easier, the old stream is always closed.
- * Then, in case, it is open again in append mode.
+ * @brief Method to configure the logger. 
+ *
+ * This method is called by the LOG_FILE() macro.
  * @param outputFile Name of the file used for logging
- * @param configuration Configuration (i.e., log on file and on screen on or off)
- * @param fileSeverityLevel Severity threshold for file
- * @param screenSeverityLevel Severity threshold for screen
  */
-void Logger::configure (const std::string&	outputFile,
-			const severity_level_t	fileSeverityLevel,
-			const severity_level_t	screenSeverityLevel)
+void Logger::setFile (const std::string& outputFile)
 {
 		Logger::lock();
 		latestMsgPrintedOnFile_ = false;
-		latestMsgPrintedOnScreen_ = false;
-
-		// Close the old stream, if needed
-		if ((fileSeverityLevel_ != OFF) && (fileSeverityLevel == OFF))
-			out_.close();
+		latestMsgPrintedOnConsole_ = false;
 
 		// Compute a new file name, if needed
 		if (outputFile != logFile_){
+
+			if (logFile_ != "")
+				out_.close();
 			std::ostringstream oss;
 			time_t currTime;
 			time(&currTime);
@@ -105,25 +98,24 @@ void Logger::configure (const std::string&	outputFile,
 			logFile_ = oss.str().c_str();
 		}
 
-		// Open a new stream, if needed
-		if ((fileSeverityLevel_ == OFF) && (fileSeverityLevel != OFF))
-			out_.open(logFile_.c_str(), std::ios::app);
-
-		fileSeverityLevel_ = fileSeverityLevel;
-		screenSeverityLevel_ = screenSeverityLevel;
+		// Open a new stream:
+		out_.open(logFile_.c_str(), std::ios::app);
 
 		Logger::unlock();
 }
 
+
+
 /**
  * \brief Destructor.
+ *
  * It only closes the file, if open, and cleans memory.
  */
 
 Logger::~Logger()
 {
 	Logger::lock();
-	if (fileSeverityLevel_ != OFF)
+	if (logFile_ != "")
 		out_.close();
 	delete m_;
 	Logger::unlock();
@@ -132,7 +124,8 @@ Logger::~Logger()
 
 /**
  * \brief Method to get a reference to the object (i.e., Singleton)
- * It is a static method.
+ *
+ * This is a static method.
  * @return Reference to the object.
  */
 Logger& Logger::getInstance()
@@ -146,10 +139,10 @@ Logger& Logger::getInstance()
 	return *m_;
 }
 
-
 /**
- * \brief Method used to print messages.
- * Called by the DEBUG() macro.
+ * @brief Method used to print messages on console.
+ *
+ * This method is called by the DEBUG(), WARNING() and ERROR() macros.
  * @param severitylevel Severity of the debug message
  * @param file Source file where the method has been called (set equal to __FILE__
  * 	      by the DEBUG macro)
@@ -157,32 +150,55 @@ Logger& Logger::getInstance()
  * called (automatically set equal to __LINE__ by the DEBUG macro)
  * @param message Message to be logged
  */
-void Logger::print(const severity_level_t severityLevel,
-					const std::string& file,
-					const int line,
-					const std::string& message)
+void Logger::printOnConsole(const std::string& file,
+			const int line,
+			const std::string& message)
 {
+
 	struct timeval currentTime;
 	gettimeofday(&currentTime, NULL);
 
 	Logger::lock();
+	
+	std::cerr << file << ":" << line << "] @ "
+		<< (currentTime.tv_sec - initialTime_.tv_sec) <<
+		":" << message << std::endl;
+	latestMsgPrintedOnConsole_ = true;
 
+	Logger::unlock();
+}
+
+
+/**
+ * @brief Method used to print messages on file.
+ *
+ * This method is called by the DEBUG(), WARNING() and ERROR() macros.
+ * @param severitylevel Severity of the debug message
+ * @param file Source file where the method has been called (set equal to __FILE__
+ * 	      by the DEBUG macro)
+ * @param line Number of line in the source code where the method has been
+ * called (automatically set equal to __LINE__ by the DEBUG macro)
+ * @param message Message to be logged
+ */
+void Logger::printOnFile(const std::string& file,
+			const int line,
+			const std::string& message)
+{
+
+	struct timeval currentTime;
+	gettimeofday(&currentTime, NULL);
+
+	Logger::lock();
+	
 	latestMsgPrintedOnFile_ = false;
-	latestMsgPrintedOnScreen_ = false;
-
-	if (fileSeverityLevel_ >= severityLevel){
-		out_ << "DEBUG [" << file << ":" << line << "] @ " <<
+	
+	if (logFile_ != "") {
+		out_ << file << ":" << line << "] @ " <<
 		    (currentTime.tv_sec - initialTime_.tv_sec) <<
 		    ":" << message << std::endl;
 		latestMsgPrintedOnFile_ = true;
 	}
 
-	if (screenSeverityLevel_ >= severityLevel){
-		std::cerr << "DEBUG [" << file << ":" << line << "] @ "
-		    << (currentTime.tv_sec - initialTime_.tv_sec) <<
-		    ":" << message << std::endl;
-		latestMsgPrintedOnScreen_ = true;
-	}
 	Logger::unlock();
 }
 

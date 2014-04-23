@@ -45,7 +45,7 @@ void Process::createProcess()
 	pid_ = fork();
 	if (pid_ == -1) {
 		running_ = false;
-		DEBUG(ERROR, "Cannot start process");
+		ERROR("Cannot start process");
 		throw std::runtime_error ("Async error");
 	}
 	
@@ -175,7 +175,7 @@ inline bool Process::checkSignalTermination()
 bool Process::sendSignal(int sig)
 {
 	if (kill(pid_, sig) != 0){
-		DEBUG(ERROR, "Error: can't send signal " << sig);
+		ERROR("Can't send signal " << sig);
 		return false;
 	}
 	return true;
@@ -209,7 +209,7 @@ bool Process::setSignalHandler(int sig, void (*handler) (int))
 	bzero( &sa, sizeof(sa) );
 	sa.sa_handler = handler;
 	if (sigaction(sig, &sa, NULL) < 0) {
-		DEBUG(ERROR, "Error: can't set signal " << sig);
+		ERROR("Can't set signal " << sig);
 		ret = false;
 	}
 	/* remove the mask */

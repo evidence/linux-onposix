@@ -61,7 +61,7 @@ bool DescriptorsMonitor::startMonitoringDescriptor(AbstractDescriptorReader& rea
 		PosixDescriptor& descriptor)
 {
 	if (FD_ISSET(descriptor.getDescriptorNumber(), &descriptorSet_)){
-		DEBUG(ERROR, "ERROR: Descriptor already monitored by some reader");
+		ERROR("Descriptor already monitored by some reader");
 		return false;
 	}
 	monitoredDescriptor* n = new monitoredDescriptor;
@@ -89,7 +89,7 @@ bool DescriptorsMonitor::startMonitoringDescriptor(AbstractDescriptorReader& rea
 bool DescriptorsMonitor::stopMonitoringDescriptor(PosixDescriptor& descriptor)
 {
 	if (!FD_ISSET(descriptor.getDescriptorNumber(), &descriptorSet_)){
-		DEBUG(ERROR, "ERROR: Descriptor was not monitored");
+		ERROR("Descriptor was not monitored");
 		return false;
 	}
 
@@ -126,14 +126,14 @@ bool DescriptorsMonitor::wait()
 			NULL,
 			NULL,
 			NULL);
-	DEBUG(DEBUG, "Select returned!");
+	DEBUG("Select returned!");
 	if (ret == -1){
 		// Error in select()
-		DEBUG(ERROR, "ERROR: select()");
+		ERROR("select()");
 		return false;
 	} else if (!ret) {
 		// Timeout
-		DEBUG(DEBUG, "Timeout()");
+		DEBUG("Timeout()");
 		return false;
 	} else {
 		// At least one descriptor is ready for read operations
@@ -143,7 +143,7 @@ bool DescriptorsMonitor::wait()
 			if (FD_ISSET((*i)->descriptor_->getDescriptorNumber(),
 			    &fd)) {
 				// Notify the class
-				DEBUG(DEBUG, "Notifying class...");
+				DEBUG("Notifying class...");
 				((*i)->reader_)->dataAvailable(*((*i)->descriptor_));
 			}
 		}

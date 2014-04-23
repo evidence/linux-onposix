@@ -48,7 +48,7 @@ FileDescriptor::FileDescriptor(const std::string& name,const  int flags)
 {
 		fd_ = open(name.c_str(), flags);
 		if (fd_ <= 0) {
-			DEBUG(ERROR, "Error opening file " << name);
+			ERROR("Opening file " << name);
 			throw std::runtime_error ("Open file error");
 		}
 }
@@ -94,7 +94,7 @@ FileDescriptor::FileDescriptor(const std::string& name, const int flags,
 {
 		fd_ = open(name.c_str(), flags, mode);
 		if (fd_ <= 0) {
-			DEBUG(ERROR, "Error opening file " << name);
+			ERROR("Opening file " << name);
 			throw std::runtime_error ("Open file error");
 		}
 }

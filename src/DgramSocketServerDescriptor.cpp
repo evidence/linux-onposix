@@ -39,7 +39,7 @@ DgramSocketServerDescriptor::DgramSocketServerDescriptor(const std::string& name
 	// socket()
 	fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(ERROR, "Error when creating socket");
+		ERROR("Socket creation");
 		throw std::runtime_error ("Socket error");
 	}
 
@@ -51,7 +51,7 @@ DgramSocketServerDescriptor::DgramSocketServerDescriptor(const std::string& name
 	    sizeof(serv_addr.sun_path) - 1);
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(ERROR, "Error when binding socket");
+		ERROR("Socket binding");
 		throw std::runtime_error ("Bind error");
 	}
 }
@@ -69,7 +69,7 @@ DgramSocketServerDescriptor::DgramSocketServerDescriptor(const uint16_t port)
 	// socket()
 	fd_ = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd_ < 0) {
-		DEBUG(ERROR, "Error when creating socket");
+		ERROR("Socket creation");
 		throw std::runtime_error ("Socket error");
 	}
 
@@ -81,7 +81,7 @@ DgramSocketServerDescriptor::DgramSocketServerDescriptor(const uint16_t port)
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	if (bind(fd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		::close(fd_);
-		DEBUG(ERROR, "Error when binding socket");
+		ERROR("Socket binding");
 		throw std::runtime_error ("Bind error");
 	}
 }

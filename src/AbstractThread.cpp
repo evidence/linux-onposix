@@ -60,7 +60,7 @@ AbstractThread::AbstractThread():
  */
 AbstractThread::~AbstractThread() {
 	if (isStarted_){
-		DEBUG(WARN, "Warning: killing a running thread!");
+		WARNING("Killing a running thread!");
 		stop();
 	}
 }
@@ -126,7 +126,7 @@ bool AbstractThread::blockSignal (int sig)
 	sigemptyset(&m);
 	sigaddset(&m, sig);
 	if (pthread_sigmask(SIG_BLOCK, &m, NULL) != 0) {
-		DEBUG(ERROR, "Error: can't mask signal " << sig);
+		ERROR("Can't mask signal " << sig);
 		return false;
 	}
 	return true;
@@ -146,7 +146,7 @@ bool AbstractThread::unblockSignal (int sig)
 	sigemptyset(&m);
 	sigaddset(&m, sig);
 	if (pthread_sigmask(SIG_UNBLOCK, &m, NULL) != 0) {
-		DEBUG(ERROR, "Error: can't unmask signal " << sig);
+		ERROR("Can't unmask signal " << sig);
 		return false;
 	}
 	return true;
@@ -162,7 +162,7 @@ bool AbstractThread::unblockSignal (int sig)
 bool AbstractThread::sendSignal(int sig)
 {
 	if (pthread_kill(handle_, sig) != 0){
-		DEBUG(ERROR, "Error: can't send signal " << sig);
+		ERROR("Can't send signal " << sig);
 		return false;
 	}
 	return true;
@@ -195,7 +195,7 @@ bool AbstractThread::setSignalHandler(int sig, void (*handler) (int))
 	bzero( &sa, sizeof(sa) );
 	sa.sa_handler = handler;
 	if (sigaction(sig, &sa, NULL) < 0) {
-		DEBUG(ERROR, "Error: can't set signal " << sig);
+		ERROR("Can't set signal " << sig);
 		ret = false;
 	}
 	/* remove the mask */
