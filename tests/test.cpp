@@ -649,6 +649,13 @@ TEST (TimeTest, OperatorEqEq)
 
 int main(int argc, char **argv)
 {
+	DEBUG("test debug 1");
+	WARNING("test warning 1");
+	ERROR("test error 1");
+	LOG_FILE("/tmp/test.cloud");
+	DEBUG("test debug 2");
+	WARNING("test warning 2");
+	ERROR("test error 2");
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }

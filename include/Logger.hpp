@@ -38,7 +38,7 @@
 
 /// Log level for console messages:
 #ifndef LOG_LEVEL_CONSOLE
-#define LOG_LEVEL_CONSOLE	LOG_ERROR
+#define LOG_LEVEL_CONSOLE	LOG_ERRORS
 #endif
 
 /// Log level for file:
