@@ -95,7 +95,7 @@ bool AbstractThread::stop()
 		return false;
 	}
 
-	DEBUG("Canceling thread...");
+	DEBUG("Cancelling thread...");
 	isStarted_ = false;
 	if (pthread_cancel(handle_) == 0){
 		DEBUG("Thread succesfully canceled.");

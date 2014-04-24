@@ -57,58 +57,54 @@ namespace onposix {
  */
 class PosixDescriptor {
 
-	/**
-	 * \brief Class to run asynchronous operations.
-	 *
-	 * This class is used to run asynchronous operations (i.e.,
-	 * read and write). operations are run on a different thread.
-	 */
-	class Worker: public AbstractThread {
-
-		struct job {
-			/**
-			 * \brief Type of scheduled async operation
-			 */
-			enum {
-				NONE		= 0, //< No operation scheduled
-				READ_BUFFER	= 1, //< Read operation on a Buffer
-				READ_VOID	= 2, //< Read operation on a void*
-				WRITE_BUFFER	= 3, //< Write operation on a Buffer
-				WRITE_VOID	= 4  //< Write operation on a void*
-			} job_type_;
+	struct job {
+		/**
+		 * \brief Type of scheduled async operation
+		 */
+		enum {
+			NONE		= 0, //< No operation scheduled
+			READ_BUFFER	= 1, //< Read operation on a Buffer
+			READ_VOID	= 2, //< Read operation on a void*
+			WRITE_BUFFER	= 3, //< Write operation on a Buffer
+			WRITE_VOID	= 4  //< Write operation on a void*
+		} job_type_;
 
 
-			/// Size of data to be read/written
-			size_t size_;
+		/// Size of data to be read/written
+		size_t size_;
 
-			/**
-			 * \brief Handler in case of read/write operation on a
-			 * Buffer
-			 */
-			void (*buff_handler_) (Buffer* b, size_t size);
+		/**
+		 * \brief Handler in case of read/write operation on a
+		 * Buffer
+		 */
+		void (*buff_handler_) (Buffer* b, size_t size);
 
-			/**
-			 * \brief Buffer in case of read/write operation on a Buffer
-			 */
-			Buffer* buff_buffer_;
+		/**
+		 * \brief Buffer in case of read/write operation on a Buffer
+		 */
+		Buffer* buff_buffer_;
 
-			/**
-			 * \brief Handler in case of read/write operation on a void*
-			 */
-			void (*void_handler_) (void* b, size_t size);
+		/**
+		 * \brief Handler in case of read/write operation on a void*
+		 */
+		void (*void_handler_) (void* b, size_t size);
 
-			/**
-			 * \brief void* pointer in case of read/write operation on a
-			 * void*
-			 */
-			void* void_buffer_;
-		};
+		/**
+		 * \brief void* pointer in case of read/write operation on a
+		 * void*
+		 */
+		void* void_buffer_;
+	};
+
+	class Worker;
+
+	struct synch {
 
 		/**
 		 * \brief Queue of pending operations.
 		 */
-		std::queue<job*> jobs_;  
-		
+		std::queue<job*> jobs_;
+
 		/**
 		 * \brief Mutex to avoid contentions in accessing jobs_
 		 *
@@ -117,8 +113,38 @@ class PosixDescriptor {
 		 */
 		PosixMutex jobs_lock_;
 
-		PosixCondition wait_completion_;
-		PosixCondition wait_new_operation_;
+		PosixCondition new_operations_;
+		PosixCondition no_operations_;
+
+		bool worker_kill_;
+
+		Worker* worker_;
+
+		bool worker_started_;
+
+		/**
+		 * \brief File descriptor
+		 *
+		 * This is a pointer to the same file descriptor that "owns"
+		 * the instance of AsyncThread.
+		 * The pointer is needed to perform the operation
+		 * (i.e., read or write).
+		 */
+		PosixDescriptor* des_;
+	};
+
+	synch* synch_;
+
+
+
+
+	/**
+	 * \brief Class to run asynchronous operations.
+	 *
+	 * This class is used to run asynchronous operations (i.e.,
+	 * read and write). operations are run on a different thread.
+	 */
+	class Worker: public AbstractThread {
 
 		// Disable default constructor
 		Worker();
@@ -131,16 +157,7 @@ class PosixDescriptor {
 		 */
 		void run();
 
-
-		/**
-		 * \brief File descriptor
-		 *
-		 * This is a pointer to the same file descriptor that "owns"
-		 * the instance of AsyncThread.
-		 * The pointer is needed to perform the operation
-		 * (i.e., read or write).
-		 */
-		PosixDescriptor* des_;
+		synch* synch_;
 
 	public:
 
@@ -151,11 +168,11 @@ class PosixDescriptor {
 		 * @param des Pointer to the PosixDescriptor that "owns"
 		 * this instance of AsyncThread
 		 */
-		explicit Worker(PosixDescriptor* des):
-		    des_(des) {}
+		explicit Worker(synch* s):
+		    synch_(s) {}
 
 		~Worker(){
-			jobs_lock_.unlock();
+			exit(1);
 		}
 
 		void startAsyncOperation (bool read_operation, 
@@ -163,25 +180,18 @@ class PosixDescriptor {
 		    	Buffer* buff, size_t size);
 		void startAsyncOperation (bool read_operation,
 		    void (*handler) (void* b, size_t size),
-		    	void* buff, size_t size);
-		
-		void waitCompletion(){
-			jobs_lock_.lock();
-			if (!jobs_.empty())
-				wait_completion_.wait(&jobs_lock_);
-		}
-		
+		    	void* buff, size_t size);	
 		
 	};
 
-	Worker* worker_;
 
-	bool worker_started_;
 		
-	PosixDescriptor(int fd): worker_(0), worker_started_(false), fd_(fd) {
-		DEBUG("Descriptor created");
-		DEBUG("Creating worker (stopped)");
-		worker_ = new Worker (this);
+	PosixDescriptor(int fd): synch_(0), fd_(fd)  {
+		synch_ = new synch;
+		synch_->des_ = this;
+		synch_->worker_started_ = false;
+		synch_->worker_ = new Worker (synch_);
+		synch_->worker_kill_ = false;
 	}
 
 	friend class Pipe;
@@ -197,9 +207,12 @@ protected:
 	int __read (void* p, size_t size);
 	int __write (const void* p, size_t size);
 
-	PosixDescriptor(): worker_(0), worker_started_(false), fd_(-1) {
-		DEBUG("Creating worker (stopped)");
-		worker_ = new Worker (this);
+	PosixDescriptor(): synch_(0), fd_(-1) {
+		synch_ = new synch;
+		synch_->des_ = this;
+		synch_->worker_started_ = false;
+		synch_->worker_ = new Worker (synch_);
+		synch_->worker_kill_ = false;
 	}
 
 public:
@@ -221,11 +234,11 @@ public:
 	    Buffer* b,
 	    size_t size){
 		DEBUG("async_read() called!");
-		if (!worker_started_){
-			worker_->start();
-			worker_started_ = true;
+		if (!(synch_->worker_started_)){
+			synch_->worker_->start();
+			synch_->worker_started_ = true;
 		}
-		worker_->startAsyncOperation(true, handler, b, size);
+		synch_->worker_->startAsyncOperation(true, handler, b, size);
 	}
 
 	/**
@@ -245,11 +258,11 @@ public:
 	    void* b,
 	    size_t size){
 		DEBUG("async_read() called!");
-		if (!worker_started_){
-			worker_->start();
-			worker_started_ = true;
+		if (!(synch_->worker_started_)){
+			synch_->worker_->start();
+			synch_->worker_started_ = true;
 		}
-		worker_->startAsyncOperation(true, handler, b, size);
+		synch_->worker_->startAsyncOperation(true, handler, b, size);
 	}
 	
 	/**
@@ -269,11 +282,11 @@ public:
 	inline void async_write(void (*handler)(Buffer* b, size_t size),
 	    Buffer* b,
 	    size_t size){
-		if (!worker_started_){
-			worker_->start();
-			worker_started_ = true;
+		if (!(synch_->worker_started_)){
+			synch_->worker_->start();
+			synch_->worker_started_ = true;
 		}
-		worker_->startAsyncOperation(false, handler, b, size);
+		synch_->worker_->startAsyncOperation(false, handler, b, size);
 	}
 
 	/**
@@ -292,11 +305,11 @@ public:
 	inline void async_write(void (*handler)(void* b, size_t size),
 	    void* b,
 	    size_t size){
-		if (!worker_started_){
-			worker_->start();
-			worker_started_ = true;
+		if (!(synch_->worker_started_)){
+			synch_->worker_->start();
+			synch_->worker_started_ = true;
 		}
-		worker_->startAsyncOperation(false, handler, b, size);
+		synch_->worker_->startAsyncOperation(false, handler, b, size);
 	}
 		
 	int read (Buffer* b, size_t size);
@@ -318,17 +331,17 @@ public:
 	 */
 	virtual ~PosixDescriptor() {
 		DEBUG("Destroying descriptor...");
-		if (worker_started_){
-			DEBUG("waitCompletion()...");
-			worker_->waitCompletion();
-			DEBUG("stop()...");
-			worker_->stop();
-			DEBUG("waitForTermination()...");
-			//worker_->waitForTermination();
+		if (synch_->worker_started_){
+			synch_->jobs_lock_.lock();
+			synch_->worker_kill_= true;
+			synch_->new_operations_.signal();
+			synch_->no_operations_.wait(&(synch_->jobs_lock_));
 		}
 		DEBUG("delete thread...");
-		delete(worker_);
+		delete(synch_->worker_);
+		delete(synch);
 		close();
+		DEBUG("Descriptor succesfully destroyed.");
 	}
 
 	/**
@@ -358,7 +371,8 @@ public:
 			throw std::runtime_error("PosixDescriptor: error in copy constructor");
 		}
 		DEBUG("Creating worker (stopped)");
-		worker_ = new Worker (this);
+		synch_ = new synch;
+		synch_->worker_ = new Worker (this);
 	}
 
 	/**

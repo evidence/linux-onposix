@@ -704,6 +704,8 @@ int main(int argc, char **argv)
 	t.stop();
 	t.waitForTermination();
 
+	DEBUG("OK");
+
 
 // 	::testing::InitGoogleTest(&argc, argv);
 // 	return RUN_ALL_TESTS();

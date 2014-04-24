@@ -49,10 +49,10 @@ void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
 	else
 		j->job_type_ = job::WRITE_BUFFER;
 
-	jobs_lock_.lock();
-	jobs_.push(j);
-	jobs_lock_.unlock();
-	wait_new_operation_.signal();
+	synch_->jobs_lock_.lock();
+	synch_->jobs_.push(j);
+	synch_->jobs_lock_.unlock();
+	synch_->new_operations_.signal();
 }
 
 
@@ -84,10 +84,10 @@ void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
 	else
 		j->job_type_ = job::WRITE_VOID;
 
-	jobs_lock_.lock();
-	jobs_.push(j);
-	jobs_lock_.unlock();
-	wait_new_operation_.signal();
+	synch_->jobs_lock_.lock();
+	synch_->jobs_.push(j);
+	synch_->jobs_lock_.unlock();
+	synch_->new_operations_.signal();
 
 
 }
@@ -105,24 +105,28 @@ void PosixDescriptor::Worker::run()
 {
 	DEBUG("Worker running");
 	for (;;) {
-		jobs_lock_.lock();
-		if (jobs_.empty()){
+		synch_->jobs_lock_.lock();
+		if (synch_->jobs_.empty()){
 			DEBUG("Worker: queue empty");
+			if (synch_->worker_kill_){
+				synch_->no_operations_.signal();
+				exit(1);
+			}
 			DEBUG("Worker blocking...");
-			wait_completion_.signal();
-			wait_new_operation_.wait(&jobs_lock_);
+			synch_->new_operations_.wait(&jobs_lock_);
 			DEBUG("Worker unblocked");
-			if (jobs_.empty())
-				stop();
-
+			if (synch_->worker_kill_){
+				synch_->no_operations_.signal();
+				exit(1);
+			}
 		}
-		job* j = jobs_.front();
-		jobs_.pop();
-		jobs_lock_.unlock();
+		job* j = synch_->jobs_.front();
+		synch_->jobs_.pop();
+		synch_->jobs_lock_.unlock();
 
 		int n;
 		DEBUG("Need to read " << j->size_ << " bytes");
-		DEBUG("File descriptor = " << des_->getDescriptorNumber());
+		DEBUG("File descriptor = " << synch_->des_->getDescriptorNumber());
 
 		if (j->job_type_ == job::READ_BUFFER)
 			n = des_->__read(j->buff_buffer_->getBuffer(), j->size_);
