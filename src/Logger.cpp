@@ -160,9 +160,11 @@ void Logger::printOnConsole(const std::string& file,
 
 	Logger::lock();
 	
-	std::cerr << file << ":" << line << "] @ "
-		<< (currentTime.tv_sec - initialTime_.tv_sec) <<
-		":" << message << std::endl;
+	std::cout <<
+	    (currentTime.tv_sec - initialTime_.tv_sec) <<
+	    ":" << message << "\t\t[" << file << ":" << line << "]" <<
+		std::endl;
+
 	latestMsgPrintedOnConsole_ = true;
 
 	Logger::unlock();
@@ -193,9 +195,10 @@ void Logger::printOnFile(const std::string& file,
 	latestMsgPrintedOnFile_ = false;
 	
 	if (logFile_ != "") {
-		out_ << file << ":" << line << "] @ " <<
+		out_ <<
 		    (currentTime.tv_sec - initialTime_.tv_sec) <<
-		    ":" << message << std::endl;
+		    ":" << message << "\t\t[" << file << ":" << line << "]" <<
+			std::endl;
 		latestMsgPrintedOnFile_ = true;
 	}
 
