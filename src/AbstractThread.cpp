@@ -90,12 +90,17 @@ bool AbstractThread::start()
  */
 bool AbstractThread::stop()
 {
-	if (!isStarted_)
+	if (!isStarted_){
+		DEBUG("Thread already stopped");
 		return false;
+	}
 
+	DEBUG("Canceling thread...");
 	isStarted_ = false;
-	if (pthread_cancel(handle_) == 0)
+	if (pthread_cancel(handle_) == 0){
+		DEBUG("Thread succesfully canceled.");
 		return true;
+	}
 	return false;
 }
 
@@ -107,6 +112,7 @@ bool AbstractThread::stop()
 bool AbstractThread::waitForTermination()
 {
 	if (pthread_join(handle_, NULL) == 0){
+		DEBUG("Thread succesfully joined.");
 		isStarted_ = false;
 		return true;
 	}

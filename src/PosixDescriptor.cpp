@@ -23,7 +23,7 @@
 namespace onposix {
 
 /**
- * \brief Function so start an asynchronous operation
+ * \brief Function to start an asynchronous operation
  *
  * This method allows to start an asynchronous operation, either read or write.
  * @param read_operation Specifies if it is a read (true) or write (false) operation
@@ -34,20 +34,25 @@ namespace onposix {
  * data is contained (for a write operation)
  * @param size Amount of bytes to be transferred
  */
-void PosixDescriptor::AsyncThread::startAsyncOperation (bool read_operation, 
+void PosixDescriptor::Worker::startAsyncOperation (bool read_operation, 
     void (*handler) (Buffer* b, size_t size),
 	Buffer* buff, size_t size)
 {
-	size_ = size;
-	buff_handler_ = handler;
-	buff_buffer_ = buff;
-	if (read_operation)
-		async_operation_ = READ_BUFFER;
-	else
-		async_operation_ = WRITE_BUFFER;
 
-	// This will call run() on a different thread:
-	start();
+	DEBUG("Async operation started with buffer*");
+	struct job* j = new job;
+	j->size_ = size;
+	j->buff_handler_ = handler;
+	j->buff_buffer_ = buff;
+	if (read_operation)
+		j->job_type_ = job::READ_BUFFER;
+	else
+		j->job_type_ = job::WRITE_BUFFER;
+
+	jobs_lock_.lock();
+	jobs_.push(j);
+	jobs_lock_.unlock();
+	wait_new_operation_.signal();
 }
 
 
@@ -64,20 +69,27 @@ void PosixDescriptor::AsyncThread::startAsyncOperation (bool read_operation,
  * data is contained (for a write operation)
  * @param size Amount of bytes to be transferred
  */
-void PosixDescriptor::AsyncThread::startAsyncOperation (bool read_operation,
+void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
     void (*handler) (void* b, size_t size),
 	void* buff, size_t size)
 {
-	size_ = size;
-	void_handler_ = handler;
-	void_buffer_ = buff;
-	if (read_operation)
-		async_operation_ = READ_VOID;
-	else
-		async_operation_ = WRITE_VOID;
 
-	// This will call run() on a different thread:
-	start();
+	DEBUG("Async operation started with void*");
+	struct job* j = new job;
+	j->size_ = size;
+	j->void_handler_ = handler;
+	j->void_buffer_ = buff;
+	if (read_operation)
+		j->job_type_ = job::READ_VOID;
+	else
+		j->job_type_ = job::WRITE_VOID;
+
+	jobs_lock_.lock();
+	jobs_.push(j);
+	jobs_lock_.unlock();
+	wait_new_operation_.signal();
+
+
 }
 
 /**
@@ -89,30 +101,49 @@ void PosixDescriptor::AsyncThread::startAsyncOperation (bool read_operation,
  * and invokes the handler.
  * @exception It throws runtime_error in case no operation has been scheduled
  */
-void PosixDescriptor::AsyncThread::run()
+void PosixDescriptor::Worker::run()
 {
-	int n;
-	
-	if (async_operation_ == READ_BUFFER)
-		n = des_->__read(buff_buffer_->getBuffer(), size_);
-	else if (async_operation_ == READ_VOID)
-		n = des_->__read(void_buffer_, size_);
-	else if (async_operation_ == WRITE_BUFFER)
-		n = des_->__write(buff_buffer_->getBuffer(), size_);
-	else if (async_operation_ == WRITE_VOID)
-		n = des_->__write(void_buffer_, size_);
-	else {
-		ERROR("Handler called without operation!");
-		throw std::runtime_error ("Async error");
-	}
-	des_->lock_.unlock();
+	DEBUG("Worker running");
+	for (;;) {
+		jobs_lock_.lock();
+		if (jobs_.empty()){
+			DEBUG("Worker: queue empty");
+			DEBUG("Worker blocking...");
+			wait_completion_.signal();
+			wait_new_operation_.wait(&jobs_lock_);
+			DEBUG("Worker unblocked");
+			if (jobs_.empty())
+				stop();
 
-	if ((async_operation_ == READ_BUFFER) ||
-	    (async_operation_ == WRITE_BUFFER))
-		buff_handler_(buff_buffer_, n);
-	else
-		void_handler_(void_buffer_, n);
-	async_operation_ = NONE;
+		}
+		job* j = jobs_.front();
+		jobs_.pop();
+		jobs_lock_.unlock();
+
+		int n;
+		DEBUG("Need to read " << j->size_ << " bytes");
+		DEBUG("File descriptor = " << des_->getDescriptorNumber());
+
+		if (j->job_type_ == job::READ_BUFFER)
+			n = des_->__read(j->buff_buffer_->getBuffer(), j->size_);
+		else if (j->job_type_ == job::READ_VOID)
+			n = des_->__read(j->void_buffer_, j->size_);
+		else if (j->job_type_ == job::WRITE_BUFFER)
+			n = des_->__write(j->buff_buffer_->getBuffer(), j->size_);
+		else if (j->job_type_ == job::WRITE_VOID)
+			n = des_->__write(j->void_buffer_, j->size_);
+		else {
+			ERROR("Handler called without operation!");
+			throw std::runtime_error ("Async error");
+		}
+		DEBUG("Read " << n << " bytes");
+
+		if ((j->job_type_ == job::READ_BUFFER) || (j->job_type_ == job::WRITE_BUFFER))
+			j->buff_handler_(j->buff_buffer_, n);
+		else
+			j->void_handler_(j->void_buffer_, n);
+		delete j;
+	}
 }
 
 
@@ -162,9 +193,7 @@ int PosixDescriptor::read (Buffer* b, size_t size)
 		ERROR("Buffer size not enough!");
 		return -1;
 	}
-	lock_.lock();
 	int ret = __read(b->getBuffer(), size);
-	lock_.unlock();
 	return ret;
 }
 
@@ -179,9 +208,7 @@ int PosixDescriptor::read (Buffer* b, size_t size)
  */
 int PosixDescriptor::read (void* p, size_t size)
 {
-	lock_.lock();
 	int ret = __read(p, size);
-	lock_.unlock();
 	return ret;
 }
 

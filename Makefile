@@ -1,7 +1,7 @@
 export LIBNAME=libonposix
 export ONPOSIX_VERSION=1.4
 export CXX = g++
-export CXXFLAGS = -O3 -Wall -Wextra -fPIC
+export CXXFLAGS = -O0 -g -Wall -Wextra -fPIC
 
 .PHONY: clean install doc $(LIBNAME).so $(LIBNAME).a
 
