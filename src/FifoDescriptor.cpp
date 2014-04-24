@@ -47,11 +47,12 @@ namespace onposix {
  */
 FifoDescriptor::FifoDescriptor(const std::string& name, const int flags)
 {
-		fd_ = open(name.c_str(), flags);
-		if (fd_ <= 0) {
-			ERROR("Opening fifo " << name);
-			throw std::runtime_error ("Open fifo error");
-		}
+	DEBUG("Opening fifo...");
+	fd_ = open(name.c_str(), flags);
+	if (fd_ <= 0) {
+		ERROR("Opening fifo " << name);
+		throw std::runtime_error ("Open fifo error");
+	}
 }
 
 
