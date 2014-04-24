@@ -110,14 +110,20 @@ void PosixDescriptor::Worker::run()
 			DEBUG("Worker: queue empty");
 			if (synch_->worker_kill_){
 				synch_->no_operations_.signal();
-				exit(1);
+				DEBUG("Worker exiting...");
+				synch_->jobs_lock_.unlock();
+				pthread_exit(0);
+				//stop();
 			}
 			DEBUG("Worker blocking...");
-			synch_->new_operations_.wait(&jobs_lock_);
+			synch_->new_operations_.wait(&(synch_->jobs_lock_));
 			DEBUG("Worker unblocked");
 			if (synch_->worker_kill_){
+				DEBUG("Worker exiting...");
 				synch_->no_operations_.signal();
-				exit(1);
+				synch_->jobs_lock_.unlock();
+				pthread_exit(0);
+				//stop();
 			}
 		}
 		job* j = synch_->jobs_.front();
@@ -129,13 +135,13 @@ void PosixDescriptor::Worker::run()
 		DEBUG("File descriptor = " << synch_->des_->getDescriptorNumber());
 
 		if (j->job_type_ == job::READ_BUFFER)
-			n = des_->__read(j->buff_buffer_->getBuffer(), j->size_);
+			n = synch_->des_->__read(j->buff_buffer_->getBuffer(), j->size_);
 		else if (j->job_type_ == job::READ_VOID)
-			n = des_->__read(j->void_buffer_, j->size_);
+			n = synch_->des_->__read(j->void_buffer_, j->size_);
 		else if (j->job_type_ == job::WRITE_BUFFER)
-			n = des_->__write(j->buff_buffer_->getBuffer(), j->size_);
+			n = synch_->des_->__write(j->buff_buffer_->getBuffer(), j->size_);
 		else if (j->job_type_ == job::WRITE_VOID)
-			n = des_->__write(j->void_buffer_, j->size_);
+			n = synch_->des_->__write(j->void_buffer_, j->size_);
 		else {
 			ERROR("Handler called without operation!");
 			throw std::runtime_error ("Async error");

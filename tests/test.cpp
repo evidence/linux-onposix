@@ -203,7 +203,7 @@ TEST (FifoDescriptorTest, MainTest)
 	std::cout << "\t\tFifo size: " << fd.getCapacity() << std::endl;
 }
 
-#if 0
+#if 1
 bool read_fifo_handler_called = false;
 
 void read_fifo_handler(Buffer* b, size_t size)
@@ -224,9 +224,10 @@ void reader_fifo(void*)
 	FifoDescriptor fd2("/tmp/test-async-1", O_RDONLY);
 	DEBUG("Fifo descriptor created. Running async_read...");
 	fd2.async_read(read_fifo_handler, &b2, 20);
+	sleep(5);
 	ASSERT_TRUE(read_fifo_handler_called == false)
 	   << "ERROR: value of read_fifo_handler_called modified";
-	sleep(5);
+
 }
 
 
@@ -241,19 +242,21 @@ TEST (FifoDescriptorTest, AsyncRead)
 	const char* s1 = "ABCDEFGHILMNOPQ";
 	Buffer b1 (15);
 	b1.fill (s1, 15);
-	sleep(2);
 
 	SimpleThread t (reader_fifo, 0);
 	t.start();
-	sleep(2);
 
 	// Again writer
 	fd1.write(&b1, 15);
-	sleep(10);
+
+	sleep(3);
 	
 	// Again reader
 	ASSERT_TRUE(read_fifo_handler_called == true)
 	   << "ERROR: handler not called";
+
+	t.stop();
+	sleep(3);
 }
 #endif
 // ======================================================================
@@ -639,7 +642,7 @@ TEST (TimeTest, OperatorEqEq)
 		<< "ERROR: in operator== for class Time";
 }
 
-
+#if 0
 bool read_fifo_handler_called = false;
 
 void read_fifo_handler(Buffer* b, size_t size)
@@ -665,13 +668,14 @@ void reader_fifo(void*)
 	   ERROR ("value of read_fifo_handler_called modified");
 	sleep(5);
 }
-
+#endif
 
 
 
 
 int main(int argc, char **argv)
 {
+#if 0
 	DEBUG("test debug 1");
 	WARNING("test warning 1");
 	ERROR("test error 1");
@@ -694,19 +698,23 @@ int main(int argc, char **argv)
 
 	// Again writer
 	fd1.write(&b1, 15);
-	
-	sleep(5);
 
+	DEBUG("OK2");
+	
 	// Again reader
 	if (read_fifo_handler_called != true)
 	   ERROR("handler not called");
 
+	DEBUG("OK1");
+
 	t.stop();
-	t.waitForTermination();
 
 	DEBUG("OK");
 
+	sleep(3);
+#else
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+#endif
 
-// 	::testing::InitGoogleTest(&argc, argv);
-// 	return RUN_ALL_TESTS();
 }

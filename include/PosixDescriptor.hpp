@@ -172,7 +172,6 @@ class PosixDescriptor {
 		    synch_(s) {}
 
 		~Worker(){
-			exit(1);
 		}
 
 		void startAsyncOperation (bool read_operation, 
@@ -336,12 +335,13 @@ public:
 			synch_->worker_kill_= true;
 			synch_->new_operations_.signal();
 			synch_->no_operations_.wait(&(synch_->jobs_lock_));
+			synch_->jobs_lock_.unlock();
 		}
 		DEBUG("delete thread...");
 		delete(synch_->worker_);
-		delete(synch);
+		delete(synch_);
 		close();
-		DEBUG("Descriptor succesfully destroyed.");
+		DEBUG("Descriptor succesfully destroyed. Let's move on!");
 	}
 
 	/**
@@ -364,7 +364,7 @@ public:
 	 * \endcode
 	 * @exception runtime_error if the ::dup() returns an error
 	 */
-	PosixDescriptor(const PosixDescriptor& src): worker_(0){
+	PosixDescriptor(const PosixDescriptor& src): synch_(0){
 		fd_ = ::dup(src.fd_);
 		if (fd_ < 0) {
 			ERROR("Bad file descriptor");
@@ -372,7 +372,7 @@ public:
 		}
 		DEBUG("Creating worker (stopped)");
 		synch_ = new synch;
-		synch_->worker_ = new Worker (this);
+		synch_->worker_ = new Worker (synch_);
 	}
 
 	/**
