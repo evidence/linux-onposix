@@ -208,6 +208,7 @@ bool read_fifo_handler_called = false;
 
 void read_fifo_handler(Buffer* b, size_t size)
 {
+	DEBUG("Handler called!");
 	read_fifo_handler_called = true;
 	ASSERT_TRUE (size == 15)
 	    << "ERROR: read the wrong number of bytes!";
@@ -225,7 +226,7 @@ void reader_fifo(void*)
 	DEBUG("Fifo descriptor created. Running async_read...");
 	fd2.async_read(read_fifo_handler, &b2, 20);
 	sleep(5);
-	ASSERT_TRUE(read_fifo_handler_called == false)
+	ASSERT_TRUE(read_fifo_handler_called == true)
 	   << "ERROR: value of read_fifo_handler_called modified";
 
 }
@@ -255,7 +256,7 @@ TEST (FifoDescriptorTest, AsyncRead)
 	ASSERT_TRUE(read_fifo_handler_called == true)
 	   << "ERROR: handler not called";
 
-	t.stop();
+	t.waitForTermination();
 	sleep(3);
 }
 #endif
