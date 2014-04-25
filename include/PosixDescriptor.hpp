@@ -96,14 +96,12 @@ class PosixDescriptor {
 		void* void_buffer_;
 	};
 
-	class Worker;
-
-	struct synch {
+	class shared_queue {
 
 		/**
 		 * \brief Queue of pending operations.
 		 */
-		std::queue<job*> jobs_;
+		std::queue<job*> queue_;
 
 		/**
 		 * \brief Mutex to avoid contentions in accessing jobs_
@@ -111,30 +109,65 @@ class PosixDescriptor {
 		 * This mutex allows to avoid contentions on the queue of jobs
 		 * when asynchronous operations are scheduled.
 		 */
-		PosixMutex jobs_lock_;
+		PosixMutex lock_;
 
-		PosixCondition new_operations_;
-		PosixCondition no_operations_;
+		PosixCondition cond_not_empty_;
+		PosixCondition cond_empty_;
 
-		bool worker_kill_;
+		bool flush_and_close_;
+	public:
+		shared_queue(): flush_and_close_(false) {}
+		void push(struct job* j){
+			lock_.lock();
+			queue_.push(j);
+			cond_not_empty_.signal();
+			lock_.unlock(); // Check
+		}
 
-		Worker* worker_;
+		void signal_not_empty(){
+			lock_.lock();
+			cond_not_empty_.signal();
+			lock_.unlock();
+		}
 
-		bool worker_started_;
+		void signal_empty(){
+			lock_.lock();
+			cond_empty_.signal();
+			lock_.unlock();
+		}
 
-		/**
-		 * \brief File descriptor
-		 *
-		 * This is a pointer to the same file descriptor that "owns"
-		 * the instance of AsyncThread.
-		 * The pointer is needed to perform the operation
-		 * (i.e., read or write).
-		 */
-		PosixDescriptor* des_;
+		void wait_not_empty(){
+			lock_.lock();
+			cond_not_empty_.wait(&lock_);
+			lock_.unlock();
+		}
+
+
+		void wait_empty(){
+			lock_.lock();
+			cond_empty_.wait(&lock_);
+			lock_.unlock();
+		}
+		void set_flush_and_close(){
+			lock_.lock();
+			flush_and_close_ = true;
+			lock_.unlock();
+		}
+		job* pop (bool* close){
+			job* ret = 0;
+			lock_.lock();
+			if (!queue_.empty()){
+				ret = queue_.front();
+				queue_.pop();
+			}
+			if (queue_.empty()){
+				cond_empty_.signal();
+			}
+			*close = flush_and_close_;
+			lock_.unlock();
+			return ret;
+		}
 	};
-
-	synch* synch_;
-
 
 
 
@@ -157,7 +190,17 @@ class PosixDescriptor {
 		 */
 		void run();
 
-		synch* synch_;
+		/**
+		 * \brief File descriptor
+		 *
+		 * This is a pointer to the same file descriptor that "owns"
+		 * the instance of AsyncThread.
+		 * The pointer is needed to perform the operation
+		 * (i.e., read or write).
+		 */
+		PosixDescriptor* des_;
+
+		shared_queue* queue_;
 
 	public:
 
@@ -168,8 +211,8 @@ class PosixDescriptor {
 		 * @param des Pointer to the PosixDescriptor that "owns"
 		 * this instance of AsyncThread
 		 */
-		explicit Worker(synch* s):
-		    synch_(s) {}
+		Worker(shared_queue* q, PosixDescriptor* des):
+		    des_(des), queue_(q)  {}
 
 		~Worker(){
 		}
@@ -183,14 +226,13 @@ class PosixDescriptor {
 		
 	};
 
-
+	Worker* worker_;
+	shared_queue* queue_;
+	bool worker_started_;
 		
-	PosixDescriptor(int fd): synch_(0), fd_(fd)  {
-		synch_ = new synch;
-		synch_->des_ = this;
-		synch_->worker_started_ = false;
-		synch_->worker_ = new Worker (synch_);
-		synch_->worker_kill_ = false;
+	PosixDescriptor(int fd): queue_(0), worker_started_(false), fd_(fd) {
+		queue_ = new shared_queue;
+		worker_ = new Worker (queue_, this);
 	}
 
 	friend class Pipe;
@@ -206,15 +248,30 @@ protected:
 	int __read (void* p, size_t size);
 	int __write (const void* p, size_t size);
 
-	PosixDescriptor(): synch_(0), fd_(-1) {
-		synch_ = new synch;
-		synch_->des_ = this;
-		synch_->worker_started_ = false;
-		synch_->worker_ = new Worker (synch_);
-		synch_->worker_kill_ = false;
+	PosixDescriptor(): queue_(0), worker_started_(false), fd_(-1) {
+		queue_ = new shared_queue;
+		worker_ = new Worker (queue_, this);
 	}
 
 public:
+	/**
+	 * \brief Desctructor. It just calls close()
+	 */
+	virtual ~PosixDescriptor() {
+		DEBUG("Destroying descriptor...");
+		if (worker_started_){
+			queue_->set_flush_and_close();
+			queue_->signal_not_empty();
+			queue_->wait_empty();
+			worker_->waitForTermination();
+		}
+		DEBUG("delete thread...");
+		delete(worker_);
+		delete(queue_);
+		close();
+		DEBUG("Descriptor succesfully destroyed. Let's move on!");
+	}
+
 
 	/**
 	 * \brief Run asynchronous read operation
@@ -233,11 +290,11 @@ public:
 	    Buffer* b,
 	    size_t size){
 		DEBUG("async_read() called!");
-		if (!(synch_->worker_started_)){
-			synch_->worker_->start();
-			synch_->worker_started_ = true;
+		if (!worker_started_){
+			worker_->start();
+			worker_started_ = true;
 		}
-		synch_->worker_->startAsyncOperation(true, handler, b, size);
+		worker_->startAsyncOperation(true, handler, b, size);
 	}
 
 	/**
@@ -257,11 +314,11 @@ public:
 	    void* b,
 	    size_t size){
 		DEBUG("async_read() called!");
-		if (!(synch_->worker_started_)){
-			synch_->worker_->start();
-			synch_->worker_started_ = true;
+		if (!worker_started_){
+			worker_->start();
+			worker_started_ = true;
 		}
-		synch_->worker_->startAsyncOperation(true, handler, b, size);
+		worker_->startAsyncOperation(true, handler, b, size);
 	}
 	
 	/**
@@ -281,11 +338,11 @@ public:
 	inline void async_write(void (*handler)(Buffer* b, size_t size),
 	    Buffer* b,
 	    size_t size){
-		if (!(synch_->worker_started_)){
-			synch_->worker_->start();
-			synch_->worker_started_ = true;
+		if (!worker_started_){
+			worker_->start();
+			worker_started_ = true;
 		}
-		synch_->worker_->startAsyncOperation(false, handler, b, size);
+		worker_->startAsyncOperation(false, handler, b, size);
 	}
 
 	/**
@@ -304,11 +361,11 @@ public:
 	inline void async_write(void (*handler)(void* b, size_t size),
 	    void* b,
 	    size_t size){
-		if (!(synch_->worker_started_)){
-			synch_->worker_->start();
-			synch_->worker_started_ = true;
+		if (!worker_started_){
+			worker_->start();
+			worker_started_ = true;
 		}
-		synch_->worker_->startAsyncOperation(false, handler, b, size);
+		worker_->startAsyncOperation(false, handler, b, size);
 	}
 		
 	int read (Buffer* b, size_t size);
@@ -325,24 +382,7 @@ public:
 		::close(fd_);
 	}
 
-	/**
-	 * \brief Desctructor. It just calls close()
-	 */
-	virtual ~PosixDescriptor() {
-		DEBUG("Destroying descriptor...");
-		if (synch_->worker_started_){
-			synch_->jobs_lock_.lock();
-			synch_->worker_kill_= true;
-			synch_->new_operations_.signal();
-			synch_->no_operations_.wait(&(synch_->jobs_lock_));
-			synch_->jobs_lock_.unlock();
-		}
-		DEBUG("delete thread...");
-		delete(synch_->worker_);
-		delete(synch_);
-		close();
-		DEBUG("Descriptor succesfully destroyed. Let's move on!");
-	}
+
 
 	/**
 	 * \brief Method to get descriptor number.
@@ -364,15 +404,15 @@ public:
 	 * \endcode
 	 * @exception runtime_error if the ::dup() returns an error
 	 */
-	PosixDescriptor(const PosixDescriptor& src): synch_(0){
+	PosixDescriptor(const PosixDescriptor& src): queue_(0), worker_started_(false) {
 		fd_ = ::dup(src.fd_);
 		if (fd_ < 0) {
 			ERROR("Bad file descriptor");
 			throw std::runtime_error("PosixDescriptor: error in copy constructor");
 		}
 		DEBUG("Creating worker (stopped)");
-		synch_ = new synch;
-		synch_->worker_ = new Worker (synch_);
+		queue_ = new shared_queue;
+		worker_ = new Worker (queue_, this);
 	}
 
 	/**

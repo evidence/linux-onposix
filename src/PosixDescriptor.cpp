@@ -49,10 +49,7 @@ void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
 	else
 		j->job_type_ = job::WRITE_BUFFER;
 
-	synch_->jobs_lock_.lock();
-	synch_->jobs_.push(j);
-	synch_->jobs_lock_.unlock();
-	synch_->new_operations_.signal();
+	queue_->push(j);
 }
 
 
@@ -84,12 +81,7 @@ void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
 	else
 		j->job_type_ = job::WRITE_VOID;
 
-	synch_->jobs_lock_.lock();
-	synch_->jobs_.push(j);
-	synch_->jobs_lock_.unlock();
-	synch_->new_operations_.signal();
-
-
+	queue_->push(j);
 }
 
 /**
@@ -105,54 +97,46 @@ void PosixDescriptor::Worker::run()
 {
 	DEBUG("Worker running");
 	for (;;) {
-		synch_->jobs_lock_.lock();
-		if (synch_->jobs_.empty()){
-			DEBUG("Worker: queue empty");
-			if (synch_->worker_kill_){
-				synch_->no_operations_.signal();
-				DEBUG("Worker exiting...");
-				synch_->jobs_lock_.unlock();
-				pthread_exit(0);
-				//stop();
+		DEBUG("===================");
+		DEBUG("New cycle");
+		bool close;
+		job* j = queue_->pop(&close);
+		if (j != 0){
+			int n;
+			DEBUG("Found one item in queue");
+			DEBUG("Need to read " << j->size_ << " bytes");
+			DEBUG("File descriptor = " << des_->getDescriptorNumber());
+
+			if (j->job_type_ == job::READ_BUFFER)
+				n = des_->__read(j->buff_buffer_->getBuffer(), j->size_);
+			else if (j->job_type_ == job::READ_VOID)
+				n = des_->__read(j->void_buffer_, j->size_);
+			else if (j->job_type_ == job::WRITE_BUFFER)
+				n = des_->__write(j->buff_buffer_->getBuffer(), j->size_);
+			else if (j->job_type_ == job::WRITE_VOID)
+				n = des_->__write(j->void_buffer_, j->size_);
+			else {
+				ERROR("Handler called without operation!");
+				throw std::runtime_error ("Async error");
 			}
-			DEBUG("Worker blocking...");
-			synch_->new_operations_.wait(&(synch_->jobs_lock_));
-			DEBUG("Worker unblocked");
-			if (synch_->worker_kill_){
-				DEBUG("Worker exiting...");
-				synch_->no_operations_.signal();
-				synch_->jobs_lock_.unlock();
+			DEBUG("Read " << n << " bytes");
+
+			DEBUG("Calling handler");
+			if ((j->job_type_ == job::READ_BUFFER) || (j->job_type_ == job::WRITE_BUFFER))
+				j->buff_handler_(j->buff_buffer_, n);
+			else
+				j->void_handler_(j->void_buffer_, n);
+			delete j;
+		} else {
+			queue_->signal_empty();
+			if (!close) {
+				DEBUG("No data in queue");
+				queue_->wait_not_empty();
+			} else {
+				DEBUG("Exiting!!");
 				pthread_exit(0);
-				//stop();
 			}
 		}
-		job* j = synch_->jobs_.front();
-		synch_->jobs_.pop();
-		synch_->jobs_lock_.unlock();
-
-		int n;
-		DEBUG("Need to read " << j->size_ << " bytes");
-		DEBUG("File descriptor = " << synch_->des_->getDescriptorNumber());
-
-		if (j->job_type_ == job::READ_BUFFER)
-			n = synch_->des_->__read(j->buff_buffer_->getBuffer(), j->size_);
-		else if (j->job_type_ == job::READ_VOID)
-			n = synch_->des_->__read(j->void_buffer_, j->size_);
-		else if (j->job_type_ == job::WRITE_BUFFER)
-			n = synch_->des_->__write(j->buff_buffer_->getBuffer(), j->size_);
-		else if (j->job_type_ == job::WRITE_VOID)
-			n = synch_->des_->__write(j->void_buffer_, j->size_);
-		else {
-			ERROR("Handler called without operation!");
-			throw std::runtime_error ("Async error");
-		}
-		DEBUG("Read " << n << " bytes");
-
-		if ((j->job_type_ == job::READ_BUFFER) || (j->job_type_ == job::WRITE_BUFFER))
-			j->buff_handler_(j->buff_buffer_, n);
-		else
-			j->void_handler_(j->void_buffer_, n);
-		delete j;
 	}
 }
 
