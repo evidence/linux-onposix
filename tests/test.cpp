@@ -558,6 +558,7 @@ TEST (ThreadSockTest, MainTest)
 	DescriptorsMonitor dm;
 	SocketReader sr(dm, &des);
 	dm.wait();
+	t.waitForTermination();
 }
 
 
