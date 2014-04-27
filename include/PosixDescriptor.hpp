@@ -57,6 +57,12 @@ namespace onposix {
  */
 class PosixDescriptor {
 
+	/**
+	 * \brief Single asynchronous operation
+	 *
+	 * This data structure contains information about a single pending
+	 * asynchronous operation.
+	 */
 	struct job {
 		/**
 		 * \brief Type of scheduled async operation
@@ -68,7 +74,6 @@ class PosixDescriptor {
 			WRITE_BUFFER	= 3, //< Write operation on a Buffer
 			WRITE_VOID	= 4  //< Write operation on a void*
 		} job_type_;
-
 
 		/// Size of data to be read/written
 		size_t size_;
@@ -99,60 +104,133 @@ class PosixDescriptor {
 	class shared_queue {
 
 		/**
-		 * \brief Queue of pending operations.
+		 * \brief Queue of all pending operations.
 		 */
 		std::queue<job*> queue_;
 
 		/**
-		 * \brief Mutex to avoid contentions in accessing jobs_
+		 * \brief Signal the worker to not block anymore.
 		 *
-		 * This mutex allows to avoid contentions on the queue of jobs
+		 * This variable signals the worker thread that must flush all
+		 * pending operations and not block on the condition variable
+		 * because the descriptor is going to be closed.
+		 */
+		bool flush_and_close_;
+
+		/**
+		 * \brief Mutex to avoid contentions.
+		 *
+		 * This mutex protects accesses to queue_ and flush_and_close_
 		 * when asynchronous operations are scheduled.
 		 */
 		PosixMutex lock_;
 
+		/**
+		 * \brief Condition for not empty queue.
+		 *
+		 * This condition signals the worker thread that there is
+		 * work to be carried out (i.e., the queue is not empty).
+		 */
 		PosixCondition cond_not_empty_;
+
+		/**
+		 * \brief Condition for empty queue.
+		 *
+		 * This condition signals the main thread that the queue is
+		 * empty. Used by the worker thread to signal the main
+		 * thread when the descriptor is going to be closed.
+		 */
 		PosixCondition cond_empty_;
 
-		bool flush_and_close_;
 	public:
+		/// Constructor
 		shared_queue(): flush_and_close_(false) {}
+
+		/**
+		 * \brief Add an asynchronous operation
+		 *
+		 * @param j asynchronous operation
+		 */
 		void push(struct job* j){
 			lock_.lock();
 			queue_.push(j);
 			cond_not_empty_.signal();
-			lock_.unlock(); // Check
+			lock_.unlock();
 		}
 
+		/**
+		 * \brief Signal the worker that there are new operations
+		 *
+		 * This method is used by the main thread to signal the worker
+		 * that there are new operations in the queue.
+		 */
 		void signal_not_empty(){
 			lock_.lock();
 			cond_not_empty_.signal();
 			lock_.unlock();
 		}
 
+		/**
+		 * \brief Signal the main thread that the queue is empty
+		 *
+		 * This method is used by the worker to signal the main thread
+		 * that the queue is empty and all pending operations have
+		 * been carried out.
+		 */
 		void signal_empty(){
 			lock_.lock();
 			cond_empty_.signal();
 			lock_.unlock();
 		}
 
+		/**
+		 * \brief Wait until there are new operations
+		 *
+		 * This method is used by the worker to wait until there are
+		 * new operations in the queue.
+		 */
 		void wait_not_empty(){
 			lock_.lock();
 			cond_not_empty_.wait(&lock_);
 			lock_.unlock();
 		}
 
-
+		/**
+		 * \brief Wait until the queue is empty
+		 *
+		 * This method is used by the main thread to wait until the
+		 * queue is empty to close the descriptor.
+		 */
 		void wait_empty(){
 			lock_.lock();
 			cond_empty_.wait(&lock_);
 			lock_.unlock();
 		}
+
+		/**
+		 * \brief Signal that the descriptor is going to be close
+		 *
+		 * This method is used to let the main thread signal the worker
+		 * that the descriptor is going to be closed, so it must flush
+		 * all pending operations and not block on wait_not_empty()
+		 * anymore.
+		 */
 		void set_flush_and_close(){
 			lock_.lock();
 			flush_and_close_ = true;
 			lock_.unlock();
 		}
+
+		/**
+		 * \brief Pop the next operation from the queue.
+		 *
+		 * This method is used by the worker to pop the next
+		 * operation from the queue.
+		 * @param close Pointer to a boolean which tells the worker if
+		 * the descriptor is going to be closed.
+		 * @return pointer to a job instance allocated in the heap; 0
+		 * if the queue is empty.
+		 */
 		job* pop (bool* close){
 			job* ret = 0;
 			lock_.lock();
@@ -168,8 +246,6 @@ class PosixDescriptor {
 			return ret;
 		}
 	};
-
-
 
 	/**
 	 * \brief Class to run asynchronous operations.
@@ -255,20 +331,16 @@ protected:
 
 public:
 	/**
-	 * \brief Desctructor. It just calls close()
+	 * \brief Destructor. It just calls close()
 	 */
 	virtual ~PosixDescriptor() {
 		DEBUG("Destroying descriptor...");
-		if (worker_started_){
-			queue_->set_flush_and_close();
-			queue_->signal_not_empty();
-			queue_->wait_empty();
-			worker_->waitForTermination();
-		}
+		DEBUG("Closing desciptor...");
+		close();
 		DEBUG("delete thread...");
 		delete(worker_);
 		delete(queue_);
-		close();
+
 		DEBUG("Descriptor succesfully destroyed. Let's move on!");
 	}
 
@@ -379,6 +451,13 @@ public:
 	 * Note: currently there is no method to re-open the descriptor.
 	 */
 	inline virtual void close(){
+		if (worker_started_){
+			DEBUG("Flushing pending data...")
+			queue_->set_flush_and_close();
+			queue_->signal_not_empty();
+			queue_->wait_empty();
+			worker_->waitForTermination();
+		}
 		::close(fd_);
 	}
 
