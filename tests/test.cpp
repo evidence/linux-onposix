@@ -27,12 +27,19 @@
 #include <string>
 
 
+/// Log level for console messages:
+#define LOG_LEVEL_CONSOLE	LOG_WARNINGS
+
+/// Log level for file:
+#define LOG_LEVEL_FILE		LOG_ALL
+#include "Logger.hpp"
+
+
 #include "Buffer.hpp"
 #include "AbstractDescriptorReader.hpp"
 #include "DescriptorsMonitor.hpp"
 #include "FileDescriptor.hpp"
 #include "FifoDescriptor.hpp"
-#include "Logger.hpp"
 #include "StreamSocketServerDescriptor.hpp"
 #include "StreamSocketServer.hpp"
 #include "StreamSocketClientDescriptor.hpp"
