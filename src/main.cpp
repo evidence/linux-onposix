@@ -38,7 +38,7 @@
  * <h1>Introduction</h1>
  *
  * OnPosix is a tiny library to abstract POSIX mechanisms to C++
- * developers.<br>
+ * developers. It offers threading, networking, logging, IPC, etc. <br>
  * <br>
  * Most features offered by this library can be found either inside the
  * <a href="http://www.boost.org" target="_blank">Boost library</a>
@@ -320,16 +320,24 @@
  *
  * <h2>Logging</h2>
  *
- * The whole library is built on top of a Logger.
  * Log messages can be printed to console and/or to a file with different
  * log levels. 
- * In file Logger.hpp the following log levels can be set for both LOG_LEVEL_CONSOLE and LOG_LEVEL_FILE :
+ *
+ * The following log levels can be set for both LOG_LEVEL_CONSOLE and LOG_LEVEL_FILE:
  * <ul>
  * <li> LOG_NOLOG: No logging
  * <li> LOG_ERRORS: Only log errors
  * <li> LOG_WARNINGS: Log warnings and errors
  * <li> LOG_ALL: Log all messages (debug messages included)
  * </ul>
+ *
+ * These values can be set directly inside the file include/Logger.hpp, or when including this file as follows:
+ *
+ * \code
+ * #define LOG_LEVEL_CONSOLE	LOG_WARNINGS
+ * #define LOG_LEVEL_FILE	LOG_ALL
+ * #include "Logger.hpp"
+ * \endcode
  *
  * To log a message, use
  * \code
