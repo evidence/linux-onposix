@@ -33,6 +33,7 @@ namespace onposix {
 
 /**
  * \brief Implementation of a thread safe FIFO queue class.
+ *
  * The template parameter is the type of the elements contained in the queue.
  * The class is non copyable and makes use of POSIX threads (pthreads).
  */
@@ -61,6 +62,7 @@ public:
 
 /**
  * \brief Constructor. Initialize the queue.
+ *
  * @exception runtime_error if the initialization fails.
  */
 template<typename T>
@@ -86,6 +88,7 @@ PosixSharedQueue<T>::~PosixSharedQueue()
 
 /**
  * \brief Inserts an element in the queue
+ *
  * @param data	The element to be added in the queue.
  */
 template<typename T>
@@ -100,6 +103,7 @@ void PosixSharedQueue<T>::push(const T &data)
 
 /**
  * \brief Extracts an element from the queue.
+ *
  * Blocks the calling thread if the queue is empty.
  * @return The first element in the queue.
  */
@@ -117,7 +121,9 @@ T PosixSharedQueue<T>::pop()
 }
 
 /**
- * \brief Empties the queue. In order to efficiently accomplish its task,
+ * \brief Empties the queue. 
+ *
+ * In order to efficiently accomplish its task,
  * this function exchanges its content with an empty queue using the specialized
  * version of swap() implemented for the STL container std::queue.
  */
@@ -130,6 +136,7 @@ void PosixSharedQueue<T>::clear()
 }
 
 /** \brief The current size of the queue.
+ *
   * @return The queue size.
   */
 template<typename T>

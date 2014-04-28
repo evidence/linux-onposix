@@ -101,6 +101,12 @@ class PosixDescriptor {
 		void* void_buffer_;
 	};
 
+	/**
+	 * \brief Class for synchronization between the main thread and the worker thread.
+	 *
+	 * This data structure is in charge of keeping a queue of pending asynchronous operations
+	 * (shared between the main thread and the worker thread) and synchronize the two threads.
+	 */
 	class shared_queue {
 
 		/**
@@ -151,7 +157,7 @@ class PosixDescriptor {
 		 *
 		 * @param j asynchronous operation
 		 */
-		void push(struct job* j){
+		inline void push(struct job* j){
 			lock_.lock();
 			queue_.push(j);
 			cond_not_empty_.signal();
@@ -164,7 +170,7 @@ class PosixDescriptor {
 		 * This method is used by the main thread to signal the worker
 		 * that there are new operations in the queue.
 		 */
-		void signal_not_empty(){
+		inline void signal_not_empty(){
 			lock_.lock();
 			cond_not_empty_.signal();
 			lock_.unlock();
@@ -177,7 +183,7 @@ class PosixDescriptor {
 		 * that the queue is empty and all pending operations have
 		 * been carried out.
 		 */
-		void signal_empty(){
+		inline void signal_empty(){
 			lock_.lock();
 			cond_empty_.signal();
 			lock_.unlock();
@@ -189,7 +195,7 @@ class PosixDescriptor {
 		 * This method is used by the worker to wait until there are
 		 * new operations in the queue.
 		 */
-		void wait_not_empty(){
+		inline void wait_not_empty(){
 			lock_.lock();
 			cond_not_empty_.wait(&lock_);
 			lock_.unlock();
@@ -201,7 +207,7 @@ class PosixDescriptor {
 		 * This method is used by the main thread to wait until the
 		 * queue is empty to close the descriptor.
 		 */
-		void wait_empty(){
+		inline void wait_empty(){
 			lock_.lock();
 			cond_empty_.wait(&lock_);
 			lock_.unlock();
@@ -215,7 +221,7 @@ class PosixDescriptor {
 		 * all pending operations and not block on wait_not_empty()
 		 * anymore.
 		 */
-		void set_flush_and_close(){
+		inline void set_flush_and_close(){
 			lock_.lock();
 			flush_and_close_ = true;
 			lock_.unlock();
@@ -226,12 +232,12 @@ class PosixDescriptor {
 		 *
 		 * This method is used by the worker to pop the next
 		 * operation from the queue.
-		 * @param close Pointer to a boolean which tells the worker if
-		 * the descriptor is going to be closed.
+		 * @param close Pointer to a boolean used as return variable to
+		 * tell the worker if the descriptor is going to be closed.
 		 * @return pointer to a job instance allocated in the heap; 0
 		 * if the queue is empty.
 		 */
-		job* pop (bool* close){
+		inline job* pop (bool* close){
 			job* ret = 0;
 			lock_.lock();
 			if (!queue_.empty()){
@@ -248,18 +254,18 @@ class PosixDescriptor {
 	};
 
 	/**
-	 * \brief Class to run asynchronous operations.
+	 * \brief Worker thread to perform asynchronous operations.
 	 *
 	 * This class is used to run asynchronous operations (i.e.,
-	 * read and write). operations are run on a different thread.
+	 * read and write). These operations are run on a different thread.
 	 */
 	class Worker: public AbstractThread {
 
-		// Disable default constructor
+		/// Disable the default constructor
 		Worker();
 
 		/**
-		 * \brief Thread method automatically called by start()
+		 * \brief Method automatically called by start()
 		 *
 		 * This method is automatically called by start() which,
 		 * in turn, is called by startAsyncOperation()
@@ -269,13 +275,20 @@ class PosixDescriptor {
 		/**
 		 * \brief File descriptor
 		 *
-		 * This is a pointer to the same file descriptor that "owns"
-		 * the instance of AsyncThread.
+		 * This is a pointer to the same PosixDescriptor that "owns"
+		 * this instance of Worker.
 		 * The pointer is needed to perform the operation
 		 * (i.e., read or write).
 		 */
 		PosixDescriptor* des_;
 
+		/**
+		 * \brief Pointer to the shared queue
+		 *
+		 * This variable points the shared_queue used for asynchronous
+		 * operations and synchronization between the main thread
+		 * and the worker thread.
+		 */
 		shared_queue* queue_;
 
 	public:
@@ -283,9 +296,11 @@ class PosixDescriptor {
 		/**
 		 * \brief Constructor. 
 		 *
-		 * It just initializes variables.
+		 * It just initializes the variables.
+		 * @param q Pointer to the shared_queue for synchronization and
+		 * pending jobs
 		 * @param des Pointer to the PosixDescriptor that "owns"
-		 * this instance of AsyncThread
+		 * this worker
 		 */
 		Worker(shared_queue* q, PosixDescriptor* des):
 		    des_(des), queue_(q)  {}
@@ -296,16 +311,44 @@ class PosixDescriptor {
 		void startAsyncOperation (bool read_operation, 
 		    void (*handler) (Buffer* b, size_t size),
 		    	Buffer* buff, size_t size);
+
 		void startAsyncOperation (bool read_operation,
 		    void (*handler) (void* b, size_t size),
 		    	void* buff, size_t size);	
 		
 	};
 
+	/**
+	 * \brief Pointer to the worker that performs asynchronous operations.
+	 *
+	 * The worker is allocated on the heap in the constructors
+	 * (2 standard + 1 copy) and deallocated in the destructor.
+	 */
 	Worker* worker_;
+
+	/**
+	 * \brief Pointer to the shared_queue for synchronization with the
+	 * worker thread
+	 *
+	 * This data structure is allocated on the heap in the constructors
+	 * (2 standard + 1 copy) and deallocated in the destructor.
+	 */
 	shared_queue* queue_;
+
+	/**
+	 * \brief If the worker thread has been already started.
+	 *
+	 * This variable is modified in async_read() and async_write();
+	 */
 	bool worker_started_;
 		
+	/**
+	 * \brief Private constructor used by derived classes
+	 *
+	 * It allocates queue_ and worker_.
+	 * @param fd File descriptor number returned by open(), socket(),
+	 * accept(), etc.
+	 */
 	PosixDescriptor(int fd): queue_(0), worker_started_(false), fd_(fd) {
 		queue_ = new shared_queue;
 		worker_ = new Worker (queue_, this);
@@ -317,6 +360,7 @@ class PosixDescriptor {
 protected:
 	/**
 	 * \brief Number of the file descriptor.
+	 *
 	 * This is the return value of open(), socket() or accept().
 	 */
 	int fd_;
@@ -324,6 +368,11 @@ protected:
 	int __read (void* p, size_t size);
 	int __write (const void* p, size_t size);
 
+	/**
+	 * \brief Constructor
+	 *
+	 * It allocates queue_ and worker_.
+	 */
 	PosixDescriptor(): queue_(0), worker_started_(false), fd_(-1) {
 		queue_ = new shared_queue;
 		worker_ = new Worker (queue_, this);
@@ -331,7 +380,10 @@ protected:
 
 public:
 	/**
-	 * \brief Destructor. It just calls close()
+	 * \brief Destructor.
+	 *
+	 * It closes the file descriptor and deallocates queue_ and
+	 * worker_.
 	 */
 	virtual ~PosixDescriptor() {
 		DEBUG("Destroying descriptor...");
@@ -448,7 +500,12 @@ public:
 
 	/**
 	 * \brief Method to close the descriptor.
+	 *
 	 * Note: currently there is no method to re-open the descriptor.
+	 * In case the worker thread has been started, it signals the worker
+	 * that it must not block on wait anymore (through
+	 * set_flush_and_close()); then it unblocks the worker (through
+	 * signal_not_empty()).
 	 */
 	inline virtual void close(){
 		if (worker_started_){
@@ -465,6 +522,7 @@ public:
 
 	/**
 	 * \brief Method to get descriptor number.
+	 *
 	 * @return Descriptor number.
 	 */
 	inline int getDescriptorNumber() const {
@@ -473,6 +531,7 @@ public:
 
 	/**
 	 * \brief Copy constructor.
+	 *
 	 * The copy constructor is called to copy an existing object to
 	 * another object that is being constructed.
 	 * Examples:
@@ -481,6 +540,7 @@ public:
 	 * PosixDescriptor p2 = p1;
 	 * PosixDesscriptor p3 (p1);
 	 * \endcode
+	 * It allocates queue_ and worker_.
 	 * @exception runtime_error if the ::dup() returns an error
 	 */
 	PosixDescriptor(const PosixDescriptor& src): queue_(0), worker_started_(false) {
@@ -496,6 +556,7 @@ public:
 
 	/**
 	 * \brief Assignment operator.
+	 *
 	 * The assignment operator is called to copy an existing object to
 	 * another object that is already existing as well.
 	 * Examples:

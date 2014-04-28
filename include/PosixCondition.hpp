@@ -32,6 +32,7 @@ namespace onposix {
 
 /**
  * \brief Implementation of a condition variable.
+ *
  * The class is non copyable and makes use of the pthread library.
  */
 class PosixCondition {
@@ -47,6 +48,7 @@ public:
 
 	/**
 	 * \brief Blocks the calling thread on the condition variable.
+	 *
 	 * These functions atomically release mutex and cause the calling thread
 	 * to block on the condition variable.
 	 * @param m Mutex released when blocking and acquired when unblocking.
@@ -58,6 +60,7 @@ public:
 
 	/**
 	 * \brief Blocks the calling thread on the condition variable.
+	 *
 	 * These functions atomically release mutex and cause the calling thread
 	 * to block on the condition variable.
 	 * @param m Mutex released when blocking and acquired when unblocking.
@@ -73,6 +76,7 @@ public:
 
 	/**
 	 * \brief Unblocks at least one of the blocked threads.
+	 *
 	 * @return 0 in case of success
 	 */
 	int signal() {
@@ -81,6 +85,7 @@ public:
 
 	/**
 	 * \brief Unblocks all blocked threads.
+	 *
 	 * @return 0 in case of success
 	 */
 	int signalAll() {

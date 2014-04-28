@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Default constructor.
+ *
  * It initializes the class with the current time (calling clock_gettime()
  * @param clockType: the type of the clock:
  * <ul>
@@ -46,6 +47,7 @@ Time::Time(clockid_t clockType): clockType_(clockType)
 
 /**
  * \brief Method to add seconds and nseconds to the current value
+ *
  * @param sec Number of seconds to be added
  * @param usec Number of nseconds to be added
  */
@@ -57,6 +59,7 @@ void Time::add(time_t sec, long nsec)
 
 /**
  * \brief Method to set the time to a specific value
+ *
  * @param sec Number of seconds to be set
  * @param usec Number of nseconds to be set
  */
@@ -68,6 +71,7 @@ void Time::set(time_t sec, long nsec)
 
 /**
  * \brief Method to reset the class to the current time.
+ *
  * This method sets the time equal to the value returned by gettimeofday().
  * @exception std::runtime_error in case of error
  */
@@ -117,6 +121,7 @@ bool Time::operator== (const Time& ref) const
 
 /**
  * \brief Method to get timer resolition.
+ *
  * @param sec: number of seconds of resolution.
  * @param nsec: number of seconds of resolution.
  * @exception std::runtime_error in case of error

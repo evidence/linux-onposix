@@ -51,6 +51,7 @@ class StreamSocketServer {
 
 	/**
 	 * \brief Number of the file descriptor.
+	 *
 	 * This is the return value of socket().
 	 */
 	int fd_;
@@ -65,6 +66,7 @@ public:
 
 	/**
 	 * \brief Destructor.
+	 *
 	 * It just calls close() to close the descriptor.
 	 */
 	virtual ~StreamSocketServer(){
@@ -80,6 +82,7 @@ public:
 
 	/**
 	 * \brief Method to get descriptor number.
+	 *
 	 * @return Descriptor number.
 	 */
 	inline int getDescriptorNumber() const {

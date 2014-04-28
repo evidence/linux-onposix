@@ -53,7 +53,7 @@
 #endif
 
 /**
- * @brief Macro to set the file used for logging.
+ * \brief Macro to set the file used for logging.
  *
  * @param Base name of the file used for logging (e.g. "/tmp/myproject")
  *
@@ -69,7 +69,7 @@
 
 
 /**
- * @brief Macro to print error messages.
+ * \brief Macro to print error messages.
  *
  * Example of usage:
  * \code
@@ -108,7 +108,7 @@
 	
 
 /**
- * @brief Macro to print warning messages.
+ * \brief Macro to print warning messages.
  *
  * Example of usage:
  * \code
@@ -148,7 +148,7 @@
 
 
 /**
- * @brief Macro to print debug messages.
+ * \brief Macro to print debug messages.
  *
  * Example of usage:
  * \code
@@ -189,7 +189,7 @@
 namespace onposix {
 
 /**
- * @brief Simple logger to log messages on file and console.
+ * \brief Simple logger to log messages on file and console.
  *
  * This is the implementation of a simple logger in C++. It is implemented 
  * as a Singleton, so it can be easily called through the DEBUG, WARNING
@@ -223,6 +223,7 @@ public:
 
 	/**
 	 * \brief Method to know if the latest message has been printed on file
+	 *
 	 * @return true if it has been printed; false otherwise
 	 */
 	inline bool latestMsgPrintedOnFile() const {
@@ -231,6 +232,7 @@ public:
 
 	/**
 	 * \brief Method to know if the latest message has been printed on file
+	 *
 	 * @return true if it has been printed; false otherwise
 	 */
 	inline bool latestMsgPrintedOnConsole() const {
@@ -249,19 +251,19 @@ private:
 #endif
 
 	/**
-	 * @brief Pointer to the unique Logger (i.e., Singleton)
+	 * \brief Pointer to the unique Logger (i.e., Singleton)
 	 */
 	static Logger* m_;
 
 	/**
-	 * @brief Initial part of the name of the file used for Logging.
+	 * \brief Initial part of the name of the file used for Logging.
 	 *
 	 * Date and time are automatically appended.
 	 */
 	std::string logFile_;
 
 	/**
-	 * @brief Stream used when logging on a file
+	 * \brief Stream used when logging on a file
 	 */
 	std::ofstream out_;
 
@@ -283,12 +285,12 @@ private:
 	bool latestMsgPrintedOnConsole_;
 
 	/**
-	 * @brief Method to lock in case of multithreading
+	 * \brief Method to lock in case of multithreading
 	 */
 	inline static void lock();
 
 	/**
-	 * @brief Method to unlock in case of multithreading
+	 * \brief Method to unlock in case of multithreading
 	 */
 	inline static void unlock();
 };

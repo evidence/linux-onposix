@@ -26,6 +26,7 @@ namespace onposix {
 
 /**
  * \brief Constructor for descriptors of files.
+ *
  * It calls open() with the given flags.
  * @param name of the file
  * @param flags that can be
@@ -56,6 +57,7 @@ FileDescriptor::FileDescriptor(const std::string& name,const  int flags)
 
 /**
  * \brief Constructor for descriptors of files.
+ *
  * It calls open() with the given flags.
  * @param name of the file
  * @param flags that can be
@@ -103,6 +105,7 @@ FileDescriptor::FileDescriptor(const std::string& name, const int flags,
 
 /**
  * \brief Method to get the length of current available data.
+ *
  * @return length of data available on the file
  */
 int FileDescriptor::getLength()

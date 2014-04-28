@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Implementation of a mutex class.
+ *
  * The class is non copyable and makes use of the pthread library.
  */
 class PosixMutex {
@@ -44,6 +45,7 @@ public:
 
 	/**
 	 * \brief Acquires the lock.
+	 *
 	 * If the mutex is busy the calling thread is blocked.
 	 */
 	void lock() {
@@ -62,6 +64,7 @@ public:
 
 /**
  * \brief Class to simplify locking and unlocking of PosixMutex
+ *
  * This is a convenience class that simplifies locking and unlocking
  * PosixMutex(es) making use of the RAII idiom: the lock is acquired in the
  * constructor and released in the destructor.
@@ -84,6 +87,7 @@ public:
 
 /**
  * \brief Class to simplify locking and unlocking of pthread mutex.
+ *
  * This class has the same purpose of the MutexLocker class but works
  * with pthread mutex type instead of PosixMutex class.
  */

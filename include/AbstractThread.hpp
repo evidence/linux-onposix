@@ -112,6 +112,7 @@ protected:
 
 	/**
 	 * \brief Function to know if the thread has finished computation.
+	 *
 	 * This function can be used in the subclasses to check if a request
 	 * for termination has been made; if so, the thread is terminated.
 	 */

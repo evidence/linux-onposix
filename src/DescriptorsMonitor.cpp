@@ -36,6 +36,7 @@ DescriptorsMonitor::DescriptorsMonitor(): highestDescriptor_(0)
 
 /**
  * \brief Destructor.
+ *
  * It just deletes the data structure containing the association between
  * readers and monitored descriptors.
  * Note: it does not deletes the descriptors and the readers, because
@@ -106,8 +107,11 @@ bool DescriptorsMonitor::stopMonitoringDescriptor(PosixDescriptor& descriptor)
 }
 
 /**
- * \brief Method to wait until some descriptor becomes ready for read operations.
- * It suspends the execution of the program until a descriptor becomes ready.
+ * \brief Method to wait until some descriptor becomes ready for read
+ * operations.
+ *
+ * It suspends the execution of the program until a descriptor becomes
+ * ready.
  * @return true in case of success; false if selects() returns error
  */
 bool DescriptorsMonitor::wait()

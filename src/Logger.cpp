@@ -53,6 +53,7 @@ inline void Logger::unlock(){}
 
 /**
  * \brief Constructor.
+ *
  * It is a private constructor, called only by getInstance() and only the
  * first time. It is called inside a lock, so lock inside this method
  * is not required.
@@ -68,7 +69,7 @@ Logger::Logger():
 }
 
 /**
- * @brief Method to configure the logger. 
+ * \brief Method to configure the logger. 
  *
  * This method is called by the LOG_FILE() macro.
  * @param outputFile Name of the file used for logging

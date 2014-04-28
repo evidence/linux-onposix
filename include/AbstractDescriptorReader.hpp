@@ -77,8 +77,10 @@ namespace onposix {
 class AbstractDescriptorReader {
 	/**
 	 * \brief Monitor that will notify the readiness of descriptors.
-	 * This is the monitor which, once monitorDescriptor(int descriptor) has
-	 * been called, will automatically call dataAvailable(int descriptor)
+	 *
+	 * This is the monitor which, once monitorDescriptor(int descriptor)
+	 * has been called, will automatically call 
+	 * dataAvailable(int descriptor)
 	 * whenever such a descriptor becomes available for read operations.
 	 */
 	DescriptorsMonitor* dm_;
@@ -86,6 +88,7 @@ class AbstractDescriptorReader {
 public:
 	/**
 	 * \brief Constructor.
+	 *
 	 * It just saves the pointer of the DescriptorsMonitor, that will be
 	 * used to register at the monitor when monitorDescriptor() will be
 	 * called.
@@ -98,7 +101,9 @@ public:
 
 	/**
 	 * \brief Method called when the descriptor becomes ready
-	 * Once monitorDescriptor(int descriptor) has been called, this method
+	 *
+	 * Once monitorDescriptor(int descriptor) has been called, this
+	 * method
 	 * will be automatically called by the DescriptorsMonitor
 	 * whenever the descriptor becomes available.
 	 * @param Reference to the descriptor that became ready for read
@@ -109,7 +114,9 @@ public:
 
 	/**
 	 * \brief Method to start monitoring a descriptor.
-	 * This method is usually called inside the constructor of the inherited
+	 *
+	 * This method is usually called inside the constructor of the
+	 * inherited
 	 * class and allows to start monitoring a specific descriptor.
 	 * @param Descriptor that must be monitored
 	 * @return true in case of success, false otherwise
@@ -120,6 +127,7 @@ public:
 
 	/**
 	 * \brief Method to stop monitoring a descriptor.
+	 *
 	 * @param Descriptor that must be monitored
 	 * @return true in case of success, false otherwise
 	 */

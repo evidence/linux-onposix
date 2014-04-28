@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Constructor. It checks size and allocates memory.
+ *
  * @param size size of the buffer
  * @exception invalid_argument in case of wrong size
  */
@@ -50,6 +51,7 @@ Buffer::~Buffer()
 
 /**
  * \brief Method to access a specific byte of the buffer.
+ *
  * It checks the argument and throws an exception in case of out of range.
  * @param p position in the buffer
  * @return the byte at the specified position
@@ -66,6 +68,7 @@ char& Buffer::operator[](unsigned long int p)
 
 /**
  * \brief Method to fill the buffer
+ *
  * It takes the content from a specified address.
  * @param src source of the content used to fill the buffer
  * @param size number of bytes to be copied
@@ -87,6 +90,7 @@ unsigned long int Buffer::fill(const char* src, unsigned long int size)
 
 /**
  * \brief Method to fill the buffer with the content of another buffer
+ *
  * The number of bytes copied is the minimum between the size of the buffer and
  * the size provided as argument.
  * @param b pointer to the buffer whose data must be used to fill this buffer
@@ -108,6 +112,7 @@ unsigned long int Buffer::fill(Buffer* b, unsigned long int size)
 
 /**
  * \brief Method to compare two buffers' content
+ *
  * It compares the content of this buffer with the content of another buffer
  * @param b the buffer against whose content it must be compared
  * @param size size of bytes to be compared
@@ -123,8 +128,11 @@ bool Buffer::compare(Buffer* b, unsigned long int size)
 }
 
 /**
- * \brief Method to compare the content of the buffer against a buffer in memory
- * It compares the content of this buffer with the content at a specified memory address
+ * \brief Method to compare the content of the buffer against a buffer
+ * in memory.
+ *
+ * It compares the content of this buffer with the content at a
+ * specified memory address
  * @param s pointer to the memory address against whose content it must be compared
  * @param size size of bytes to be compared
  * @return true if the contents match, false otherwise

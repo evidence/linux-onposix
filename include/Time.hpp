@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Class to contain a time
+ *
  * This class wraps a time, with a resolution of nanoseconds.
  * It is useful to get the current time and to make comparisons between times.
  */
@@ -55,6 +56,7 @@ public:
 
 	/**
 	 * \brief Method to get the number of seconds
+	 *
 	 * @return Number of seconds
 	 */
 	inline time_t getSeconds() const {
@@ -63,6 +65,7 @@ public:
 
 	/**
 	 * \brief Method to get the number of microseconds
+	 *
 	 * @return Number of microseconds
 	 */
 	inline long getNSeconds() const {

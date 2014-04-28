@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Very simple buffer with control on overflow.
+ *
  * This is a simple buffer, internally allocated as a char buffer with new
  * and delete.
  * With respect to hand-made buffers, it adds the check on boundaries.
@@ -56,6 +57,7 @@ public:
 
 	/**
 	 * \brief Method to get a pointer to the buffer.
+	 *
 	 * @return position of the first byte
 	 */
 	char* getBuffer(){
@@ -64,6 +66,7 @@ public:
 
 	/**
 	 * \brief Method to get the size of the buffer
+	 *
 	 * @return Size of the buffer
 	 */
 	inline unsigned long int getSize() const {

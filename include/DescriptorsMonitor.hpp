@@ -62,12 +62,14 @@ class AbstractDescriptorReader;
 class DescriptorsMonitor {
 	/**
 	 * \brief Current set of monitored descriptors.
+	 *
 	 * This set is given as argument to the select() syscall.
 	 */
 	fd_set descriptorSet_;
 
 	/**
 	 * \brief Highest-value descriptor in descriptorSet_.
+	 *
 	 * The select() syscall needs this value + 1.
 	 */
 	int highestDescriptor_;
@@ -78,6 +80,7 @@ class DescriptorsMonitor {
 	struct monitoredDescriptor {
 		/**
 		 * \brief Pointer to the observer class.
+		 *
 		 * This points to the class that wants to be notified when
 		 * the descriptor ise ready for read operations.
 		 */

@@ -30,6 +30,7 @@ namespace onposix {
 
 /**
  * \brief Constructor for local (i.e., AF_UNIX) sockets.
+ *
  * It calls socket()+connect().
  * @param name Name of the local socket on the filesystem
  * @exception runtime_error in case of error in socket() or connect()
@@ -59,6 +60,7 @@ DgramSocketClientDescriptor::DgramSocketClientDescriptor(const std::string& name
 
 /**
  * \brief Constructor for UDP (i.e., AF_INET) sockets.
+ *
  * It calls socket()+connect().
  * @param port Port of the socket
  * @exception runtime_error in case of error in socket() or connect()

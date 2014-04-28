@@ -28,6 +28,7 @@ namespace onposix {
 
 /**
  * \brief Constructor. Initialize the condition variable.
+ *
  * @exception runtime_error if the initialization of the condition variable
  * fails.
  */

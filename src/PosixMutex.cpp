@@ -28,6 +28,7 @@ namespace onposix {
 
 /**
  * \brief Constructor. Initialize the mutex.
+ *
  * @exception runtime_error if the mutex initialization fails.
  */
 PosixMutex::PosixMutex()
@@ -45,7 +46,9 @@ PosixMutex::~PosixMutex()
 }
 
 /**
- * \brief Tries to acquire the lock. If the mutex is busy the calling thread
+ * \brief Tries to acquire the lock.
+ *
+ * If the mutex is busy the calling thread
  * continues its executions
  * @return True if the lock is acquired, false otherwise.
  */

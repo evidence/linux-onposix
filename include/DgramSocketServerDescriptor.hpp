@@ -60,6 +60,7 @@ public:
 
 	/**
 	 * \brief Destructor.
+	 *
 	 * It just calls close() to close the descriptor.
 	 */
 	virtual ~DgramSocketServerDescriptor(){

@@ -30,6 +30,7 @@ namespace onposix {
 
 /**
  * \brief The static function representing the code executed in the thread context.
+ * 
  * This function just calls the run() function of the subclass.
  * We need this level of indirection because pthread_create() cannot accept
  * a method which is non static or virtual.
@@ -55,6 +56,7 @@ AbstractThread::AbstractThread():
 
 /**
  * \brief Destructor.
+ *
  * In case the thread is running, it stops the thread and prints an error
  * message.
  */
@@ -66,7 +68,9 @@ AbstractThread::~AbstractThread() {
 }
 
 /**
- * \brief Starts execution of the thread by calling run(). If the thread is
+ * \brief Starts execution of the thread by calling run().
+ *
+ * If the thread is
  * already started this function does nothing.
  * @return true if the thread is started or it has been previously started;
  * false if an error occurs when starting the thread.
@@ -85,6 +89,7 @@ bool AbstractThread::start()
 
 /**
  * \brief Stops the running thread.
+ *
  * @return true on success; false if an error occurs or the thread
  * is not running (i.e., it has not been started or it has been already stopped)
  */
@@ -105,7 +110,9 @@ bool AbstractThread::stop()
 }
 
 /**
- * \brief Blocks the calling thread until the thread associated with
+ * \brief Blocks the calling thread until the thread is finished.
+ *
+ * This method blocks the calling thread until the thread associated with
  * the AbstractThread object has finished execution
  * @return true on success, false if an error occurs.
  */
@@ -121,6 +128,7 @@ bool AbstractThread::waitForTermination()
 
 /**
  * \brief Masks a specific signal on this thread
+ *
  * This method allows to block a specific signal
  * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be blocked
@@ -140,8 +148,9 @@ bool AbstractThread::blockSignal (int sig)
 
 /**
  * \brief Unmasks a signal previously masked
- * This method allows to unblock a specific signal previously blocked through
- * blockSignal().
+ *
+ * This method allows to unblock a specific signal previously blocked
+ * through blockSignal().
  * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be unblocked
  * @return true on success; false if some error occurred
@@ -160,6 +169,7 @@ bool AbstractThread::unblockSignal (int sig)
 
 /**
  * \brief Sends a signal to the thread
+ *
  * This method allows to send a signal from one thread to another thread
  * The list of signals is available on /usr/include/bits/signum.h
  * @param sig the signal to be sent
@@ -176,10 +186,13 @@ bool AbstractThread::sendSignal(int sig)
 
 /**
  * \brief Set a handler for a specific signal
- * This method allows to manually set a handler for handling a specific signal.
+ *
+ * This method allows to manually set a handler for handling a
+ * specific signal.
  * The list of signals is available on /usr/include/bits/signum.h
  * Use signals less as possible, mainly for standard situations.
- * During the execution of the handler other signals may arrive. This can lead
+ * During the execution of the handler other signals may arrive.
+ * This can lead
  * to inconsistent states. The handler must be short.
  * It must just update the internal state and/or kill the application.
  * Not all library functions can be called inside the handler without having
@@ -212,6 +225,7 @@ bool AbstractThread::setSignalHandler(int sig, void (*handler) (int))
 
 /**
  * \brief Set scheduling policy and priority
+ *
  * @param policy: policy (SCHED_FIFO, SCHED_RR or SCHED_OTHER)
  * @param priority: scheduling priority
  * @return true in case of success; false in case of error
@@ -228,6 +242,7 @@ bool AbstractThread::setSchedParam(int policy, int priority)
 
 /**
  * \brief Get current scheduling policy and priority
+ *
  * @param policy: policy (SCHED_FIFO, SCHED_RR or SCHED_OTHER)
  * @param priority: scheduling priority; it has a meaning only for SCHED_FIFO
  * and SCHED_RR

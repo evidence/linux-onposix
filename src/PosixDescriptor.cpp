@@ -89,7 +89,7 @@ void PosixDescriptor::Worker::startAsyncOperation (bool read_operation,
  *
  * This is the function automatically called by start() which, in turn, is called by
  * startAsyncOperation().
- * The function is run on a different thread. It performs the read/write operation
+ * The function is run by the worker thread. It performs the read/write operation
  * and invokes the handler.
  * @exception It throws runtime_error in case no operation has been scheduled
  */

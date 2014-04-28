@@ -48,6 +48,7 @@ public:
 
 	/**
 	 * \brief Method to reposition at a certain offset
+	 *
 	 * @param offset Offset from the beginning of file
 	 * @return the actual offset location in case of success; -1 in case of
 	 * error
@@ -59,6 +60,7 @@ public:
 
 	/**
 	 * \brief Sync the descriptor
+	 *
 	 * Method to call fsync on the descriptor. Usually after a write
 	 * operation.
 	 */

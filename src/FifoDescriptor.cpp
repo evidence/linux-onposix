@@ -27,6 +27,7 @@ namespace onposix {
 
 /**
  * \brief Constructor for descriptors of fifos.
+ *
  * It calls open() with the given flags.
  * @param name of the fifo
  * @param flags that can be
@@ -58,6 +59,7 @@ FifoDescriptor::FifoDescriptor(const std::string& name, const int flags)
 
 /**
  * \brief Constructor for descriptors of fifos.
+ *
  * It calls open() with the given flags.
  * @param name of the file
  * @param flags that can be
@@ -105,6 +107,7 @@ FifoDescriptor::FifoDescriptor(const std::string& name, const int flags,
 
 /**
  * \brief Method to get the capacity of the fifo
+ *
  * @return length of data available on the file;
  * 		-1 in case of error or unlimited capacity
  * @exception runtime_error in case it's not possible to get the capacity

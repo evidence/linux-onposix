@@ -9,7 +9,9 @@
 
 namespace onposix {
 
-/** \brief Thread-safe FIFO priority queue class.
+/** 
+ * \brief Thread-safe FIFO priority queue class.
+ *
  * No aging techniques are implemented, so that the low priority elements
  * can starve. The class is noncopyable. \n
  * The template paramaters are:
@@ -47,6 +49,7 @@ public:
 
 /**
  * \brief Constructor. Initialize the queue.
+ *
  * @exception runtime_error if the initialization fails.
  */
 template<typename T, typename _Priority>
@@ -72,7 +75,10 @@ PosixPrioritySharedQueue<T, _Priority>::~PosixPrioritySharedQueue()
 	VERIFY_ASSERTION(!pthread_cond_destroy(&empty_));
 }
 
-/** \brief Adds new priority. If the priority already exists does nothing.
+/** 
+ * \brief Adds new priority. 
+ *
+ * If the priority already exists does nothing.
  * \param prio	The priority to be added.
  */
 template<typename T, typename _Priority>
@@ -84,7 +90,9 @@ void PosixPrioritySharedQueue<T, _Priority>::addQueue(const _Priority &prio)
 						   prio, std::queue<T>()));
 }
 
-/** \brief Insert an new element in the queue.
+/** 
+ * \brief Insert an new element in the queue.
+ *
  * @param data	The element to be added.
  * @param prio	The priority of the element.
  */
@@ -103,7 +111,9 @@ void PosixPrioritySharedQueue<T, _Priority>::push(const T& data,
 	pthread_mutex_unlock(&mutex_);
 }
 
-/** \brief Extract an element from the queue.
+/** 
+ * \brief Extract an element from the queue.
+ * 
  * If the queue is empty the calling thread is blocked.
  * @return The first of the highest priority element in the queue.
  */
@@ -131,7 +141,9 @@ T PosixPrioritySharedQueue<T, _Priority>::pop()
 }
 
 /**
- * \brief Empties the queue. In order to efficiently accomplish its task,
+ * \brief Empties the queue. 
+ *
+ * In order to efficiently accomplish its task,
  * this function exchanges its content with an empty queue using the specialized
  * version of swap() implemented for the STL container std::map.
  */
@@ -144,7 +156,9 @@ void PosixPrioritySharedQueue<T, _Priority>::clear()
 	globalSize_ = 0;
 }
 
-/** \brief The current size of the queue.
+/** 
+ * \brief The current size of the queue.
+ *
  * @return The queue size.
  */
 template<typename T, typename _Priority>
