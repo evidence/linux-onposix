@@ -365,8 +365,8 @@ protected:
 	 */
 	int fd_;
 
-	int __read (void* p, size_t size);
-	int __write (const void* p, size_t size);
+	int do_read (void* p, size_t size);
+	int do_write (const void* p, size_t size);
 
 	/**
 	 * \brief Constructor

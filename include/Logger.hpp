@@ -80,29 +80,29 @@
 	#define ERROR(...)
 #elif (LOG_LEVEL_CONSOLE < LOG_ERRORS)
 	#define ERROR(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[ERROR]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[ERROR]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #elif (LOG_LEVEL_FILE < LOG_ERRORS)
 	#define ERROR(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[ERROR]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[ERROR]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #else
 	#define ERROR(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[ERROR]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[ERROR]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #endif
 	
@@ -119,29 +119,29 @@
 	#define WARNING(...)
 #elif (LOG_LEVEL_CONSOLE < LOG_WARNINGS)
 	#define WARNING(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[WARNING]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[WARNING]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #elif (LOG_LEVEL_FILE < LOG_WARNINGS)
 	#define WARNING(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[WARNING]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[WARNING]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #else
 	#define WARNING(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[WARNING]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[WARNING]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #endif
 
@@ -159,29 +159,29 @@
 	#define DEBUG(...)
 #elif (LOG_LEVEL_CONSOLE < LOG_ALL)
 	#define DEBUG(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[DEBUG]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[DEBUG]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #elif (LOG_LEVEL_FILE < LOG_ALL)
 	#define DEBUG(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[DEBUG]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[DEBUG]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #else
 	#define DEBUG(msg) { \
-		std::ostringstream __debug_stream__; \
-		__debug_stream__ << "[DEBUG]\t"; \
-		__debug_stream__ << msg; \
+		std::ostringstream logger_dbg_stream__; \
+		logger_dbg_stream__ << "[DEBUG]\t"; \
+		logger_dbg_stream__ << msg; \
 		onposix::Logger::getInstance().printOnConsole(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		onposix::Logger::getInstance().printOnFile(__FILE__, __LINE__, \
-				__debug_stream__.str()); \
+				logger_dbg_stream__.str()); \
 		}
 #endif
 

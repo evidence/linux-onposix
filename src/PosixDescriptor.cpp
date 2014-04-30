@@ -108,13 +108,13 @@ void PosixDescriptor::Worker::run()
 			DEBUG("File descriptor = " << des_->getDescriptorNumber());
 
 			if (j->job_type_ == job::READ_BUFFER)
-				n = des_->__read(j->buff_buffer_->getBuffer(), j->size_);
+				n = des_->do_read(j->buff_buffer_->getBuffer(), j->size_);
 			else if (j->job_type_ == job::READ_VOID)
-				n = des_->__read(j->void_buffer_, j->size_);
+				n = des_->do_read(j->void_buffer_, j->size_);
 			else if (j->job_type_ == job::WRITE_BUFFER)
-				n = des_->__write(j->buff_buffer_->getBuffer(), j->size_);
+				n = des_->do_write(j->buff_buffer_->getBuffer(), j->size_);
 			else if (j->job_type_ == job::WRITE_VOID)
-				n = des_->__write(j->void_buffer_, j->size_);
+				n = des_->do_write(j->void_buffer_, j->size_);
 			else {
 				ERROR("Handler called without operation!");
 				throw std::runtime_error ("Async error");
@@ -153,7 +153,7 @@ void PosixDescriptor::Worker::run()
  * @exception runtime_error if the ::read() returns an error
  * @return The number of actually read bytes or -1 in case of error
  */
-int PosixDescriptor::__read (void* buffer, size_t size)
+int PosixDescriptor::do_read (void* buffer, size_t size)
 {
 	size_t remaining = size;
 	while (remaining > 0) {
@@ -187,7 +187,7 @@ int PosixDescriptor::read (Buffer* b, size_t size)
 		ERROR("Buffer size not enough!");
 		return -1;
 	}
-	int ret = __read(b->getBuffer(), size);
+	int ret = do_read(b->getBuffer(), size);
 	return ret;
 }
 
@@ -202,7 +202,7 @@ int PosixDescriptor::read (Buffer* b, size_t size)
  */
 int PosixDescriptor::read (void* p, size_t size)
 {
-	int ret = __read(p, size);
+	int ret = do_read(p, size);
 	return ret;
 }
 
@@ -221,7 +221,7 @@ int PosixDescriptor::read (void* p, size_t size)
  * @exception runtime_error if the ::write() returns 0 or an error
  * @return The number of actually written bytes or -1 in case of error
  */
-int PosixDescriptor::__write (const void* buffer, size_t size)
+int PosixDescriptor::do_write (const void* buffer, size_t size)
 {
 	size_t remaining = size;
 	while (remaining > 0) {
@@ -254,7 +254,7 @@ int PosixDescriptor::write (Buffer* b, size_t size)
 		ERROR("Buffer size not enough!");
 		return -1;
 	}
-	return __write(reinterpret_cast<const void*> (b->getBuffer()),
+	return do_write(reinterpret_cast<const void*> (b->getBuffer()),
 	    size);
 }
 
@@ -268,7 +268,7 @@ int PosixDescriptor::write (Buffer* b, size_t size)
  */
 int PosixDescriptor::write (const void* p, size_t size)
 {
-	return __write(p, size);
+	return do_write(p, size);
 }
 
 
@@ -281,7 +281,7 @@ int PosixDescriptor::write (const void* p, size_t size)
  */
 int PosixDescriptor::write (const std::string& s)
 {
-	return __write(reinterpret_cast<const void*> (s.c_str()), s.size());
+	return do_write(reinterpret_cast<const void*> (s.c_str()), s.size());
 }
 
 } /* onposix */
