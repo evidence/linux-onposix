@@ -1,5 +1,0 @@
-OnPosix is a minimal C++ library that allows to speed-up development on Posix
-platforms (e.g., Linux).
-
-Official web-site: http://onposix.sourceforge.net
-
